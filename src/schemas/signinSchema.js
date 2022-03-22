@@ -1,8 +1,8 @@
 import Joi from "joi";
 
 const signinSchema = Joi.object({
-  name: Joi.string().required(),
-  email: Joi.email().required(),
+  email: Joi.string().required(),
+  password: Joi.string().required(),
 });
 
 export default signinSchema;
