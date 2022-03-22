@@ -1,4 +1,4 @@
-import { verifyExistingUser } from "../repositories/authRepository";
+import { verifyExistingUser } from "../repositories/authRepository.js";
 
 export async function createUser(req, res) {
   const user = req.body;

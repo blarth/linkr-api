@@ -1,4 +1,4 @@
-import connection from "../../db";
+import connection from "../../db.js";
 
 export async function verifyExistingUser(email) {
   return connection.query("SELECT * FROM users WHERE email=$1", [email]);

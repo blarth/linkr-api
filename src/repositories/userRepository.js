@@ -1,12 +1,12 @@
-import connection from "../../db";
+import connection from "../../db.js";
 
 export async function createUser(user, passwordHash) {
   return connection.query(
     `
           INSERT INTO 
-            users(name, email, password) 
-          VALUES ($1, $2, $3)
+            users(name, email, password ,image) 
+          VALUES ($1, $2, $3,$4)
         `,
-    [user.name, user.email, passwordHash]
+    [user.username, user.email, passwordHash, user.image]
   );
 }
