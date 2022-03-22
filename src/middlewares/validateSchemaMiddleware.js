@@ -1,8 +1,9 @@
 export default function validateSchemaMiddleware(schema) {
   return (req, res, next) => {
-    const validation = validate(req.body);
+    const validation = schema.validate(req.body);
     if (validation.error) {
-      return res.sendStatus(422);
+      console.log(validation.error.message);
+      return res.status(422).send(validation.error.message);
     }
     next();
   };
