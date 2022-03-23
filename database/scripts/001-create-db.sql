@@ -18,7 +18,7 @@ CREATE TABLE hashtags (
 	"name" TEXT NOT NULL UNIQUE
 );
 
-CREATE TABLE hashtagsPosts (
+CREATE TABLE "hashtagsPosts" (
 	"id" SERIAL PRIMARY KEY,
 	"hashtagId" INTEGER NOT NULL REFERENCES "hashtags"("id"),
 	"postId" INTEGER NOT NULL REFERENCES "posts"("id")
