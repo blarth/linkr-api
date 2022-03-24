@@ -21,6 +21,7 @@
     "nodemon": "^2.0.15",
     "pg": "^8.7.3",
     "string-strip-html": "^9.1.7",
+    "url-metadata": "^2.5.0",
     "uuid": "^8.3.2"
   }
 }
