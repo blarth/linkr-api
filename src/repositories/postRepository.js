@@ -49,10 +49,12 @@ export async function getLastPost(id) {
 
 export async function getPosts() {
   return connection.query({
-    text: `SELECT *
+    text: `SELECT posts.*, "metaData".*, users.name, users.image AS "userImage"
       FROM posts
       JOIN "metaData" 
       ON posts.id="metaData"."postId"
+      JOIN users
+      ON posts."userId"=users.id
       ORDER BY posts.id DESC
       LIMIT 20 `,
     rowMode: "array",
