@@ -8,6 +8,9 @@ import {
 export async function postLink(req, res) {
   const { link, postText } = req.body;
   const { user } = res.locals;
+  const {regex} = res.locals;
+
+
   try {
     await createPost(link, postText, user.id);
     const { rows: lastPost } = await getLastPost(user.id);
