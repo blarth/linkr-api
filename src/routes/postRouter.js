@@ -7,6 +7,7 @@ import validateSchemaMiddleware from "../middlewares/validateSchemaMiddleware.js
 const postRouter = Router();
 
 
+
 postRouter.get("/timeline", validateTokenMiddleware, posts)
 
 postRouter.post(
