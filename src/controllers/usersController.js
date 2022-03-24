@@ -19,3 +19,9 @@ export async function createUser(req, res) {
     return res.sendStatus(500);
   }
 }
+
+export async function getUser(req, res) {
+  const { user } = res.locals;
+
+  res.send({ id: user.id, image: user.image });
+}
