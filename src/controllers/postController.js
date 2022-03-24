@@ -1,20 +1,54 @@
-import connection from "../../db.js";
+import {
+  createPost,
+  getPosts,
+  createMetaData,
+  getLastPost,
+} from "../repositories/postRepository.js";
 
 export async function postLink(req, res) {
-  const {link, postText} = req.body;
-  const { user } = res.locals
-  console.log(user);
+  const { link, postText } = req.body;
+  const { user } = res.locals;
   try {
-        await connection.query(`
-        INSERT INTO 
-          posts (link, "postText", "userId")
-          VALUES ($1, $2, $3)
-      `, [link, postText, user.id]);
-
+    await createPost(link, postText, user.id);
+    const { rows: lastPost } = await getLastPost(user.id);
+    await createMetaData(lastPost);
 
     res.sendStatus(201);
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
+  }
+}
+
+export async function posts(req, res) {
+  try {
+    const result = await getPosts();
+
+    res.send(
+      result.rows.map((row) => {
+        const [
+          id,
+          link,
+          postText,
+          userId,
+          metaId,
+          postId,
+          url,
+          title,
+          description,
+          image,
+        ] = row;
+
+        return {
+          id,
+          link,
+          postText,
+          userId,
+          metadata: { url, title, description, image },
+        };
+      })
+    );
+  } catch (error) {
+    console.log(error);
   }
 }
