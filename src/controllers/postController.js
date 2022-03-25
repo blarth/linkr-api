@@ -15,7 +15,7 @@ export async function postLink(req, res) {
     await createPost(link, postText, user.id);
     const { rows: lastPost } = await getLastPost(user.id);
     await createMetaData(lastPost);
-
+    
     res.sendStatus(201);
   } catch (error) {
     console.log(error);

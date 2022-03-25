@@ -7,33 +7,37 @@ export async function createPost(link, postText, id) {
     INSERT INTO 
     posts (link, "postText", "userId")
     VALUES ($1, $2, $3)
+    RETURNING *
     `,
     [link, postText, id]
   );
 }
 
 export async function createMetaData([post]) {
-  urlMetadata(post.link).then(
-    function (metadata) {
-      return connection.query(
-        `
-    INSERT INTO
-    "metaData" ("postId", url, title, description, image)
-    VALUES ($1, $2, $3, $4, $5)
-    `,
-        [
-          post.id,
-          metadata.url,
-          metadata.title,
-          metadata.description,
-          metadata.image,
-        ]
-      );
-    },
-    function (error) {
-      console.log(error);
-    }
-  );
+  
+
+  try {
+    const metadata = await urlMetadata(post.link);
+    
+    
+    return connection.query(
+      `
+      INSERT INTO
+      "metaData" ("postId", url, title, description, image)
+      VALUES ($1, $2, $3, $4, $5)
+      
+      `,
+      [
+        post.id,
+        metadata.url,
+        metadata.title,
+        metadata.description,
+        metadata.image,
+      ]
+    );
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 export async function getLastPost(id) {
@@ -59,4 +63,12 @@ export async function getPosts() {
       LIMIT 20 `,
     rowMode: "array",
   });
+}
+
+export async function getPosts2() {
+  return connection.query(
+    `SELECT *
+      FROM posts
+    `
+  );
 }
