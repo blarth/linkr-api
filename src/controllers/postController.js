@@ -4,21 +4,21 @@ import {
   createMetaData,
   getLastPost,
 } from "../repositories/postRepository.js";
-import { postHashtag } from "../repositories/hashtagRepository.js";
+import { getExistingHashtags, insertHashtags } from "../repositories/hashtagRepository.js";
 
 export async function postLink(req, res) {
   const { link, postText } = req.body;
   const { user } = res.locals;
-  const {regex} = res.locals;
-
+  const { regex } = res.locals;
   try {
-    //await createPost(link, postText, user.id);
-    // const { rows: lastPost } = await getLastPost(user.id);
-    // await createMetaData(lastPost);
-    if(regex){
-      postHashtags(req.body.id, res);
+    /*
+    await createPost(link, postText, user.id);
+    const { rows: lastPost } = await getLastPost(user.id);
+    await createMetaData(lastPost);
+    */
+    if(regex.length > 0){
+      postHashtags(/*lastPost[0].id*/user, res);
     }else res.sendStatus(201);
-
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
@@ -26,23 +26,60 @@ export async function postLink(req, res) {
 }
 
 async function postHashtags(id, res){
-  const {regex} = res.locals;
-  let str = "WHERE ";
-  let firstTime = true;
-  const arr= [];
-  for(let i = 0 ; i < regex.length ; i++){
-    if(firstTime){
-      arr.push(regex[0][0]);
-      str+=`name = $${arr.length}`
-      firstTime = false
+  try{
+    const {regex} = res.locals;
+    for(let i = 0; i < regex.length; i++){
+      if(i != regex.indexOf(regex[i])){
+        regex.splice(i, 1)
+        i--
+      }
     }
-    else{
-      arr.push(regex[i][0])
-      str+= ` OR name = $${arr.length}`
+    let str = "WHERE ";
+    let firstTime = true;
+    let arr= [];
+    for(let i = 0 ; i < regex.length ; i++){
+      if(firstTime){
+        arr.push(regex[0]);
+        str+=`name = $${arr.length}`
+        firstTime = false
+      }
+      else{
+        arr.push(regex[i])
+        str+= ` OR name = $${arr.length}`
+      }
     }
+    const { rows: existingHashtags } = await getExistingHashtags(str, arr);
+    const hashtagsToAdd = [...regex]
+    for(let i = 0; i < existingHashtags.length; i++){
+      hashtagsToAdd.splice(hashtagsToAdd.indexOf(existingHashtags[i].name), 1)
+    }
+    
+    if(hashtagsToAdd.length > 0){
+      str = "VALUES ";
+      arr = [];
+      for(let i = 0 ; i < hashtagsToAdd.length ; i++){
+        arr.push(hashtagsToAdd[i]);
+        if(i < hashtagsToAdd.length - 1){
+          str+=`($${arr.length}), `
+        }
+        else{
+          str+= `($${arr.length})`
+        }
+      }
+      const { rows: newHashtags } = await insertHashtags(str, arr)
+      const allHashtags = [...existingHashtags, ...newHashtags]
+      res.status(200).send(allHashtags)
+    }else{
+      res.status(200).send(existingHashtags)
+    }
+  }catch(error){
+      console.log(error);
+      res.sendStatus(500);
   }
-  const {rows} = await postHashtag(str, arr);
-  res.send(`${rows[0].id}`).status(201);
+}
+
+async function postHashtagsLinks(){
+
 }
 
 export async function posts(req, res) {
