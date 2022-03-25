@@ -40,16 +40,21 @@ export async function posts(req, res) {
           title,
           description,
           image,
-          liked,
+          userName,
+          userImage,
+          isLike,
         ] = row;
 
         return {
           id,
           link,
           postText,
+          postId,
           userId,
           metadata: { url, title, description, image },
-          liked: liked,
+          userName,
+          userImage,
+          isLike: isLike,
         };
       })
     );
