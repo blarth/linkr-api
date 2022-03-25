@@ -15,7 +15,7 @@ export async function postLink(req, res) {
     await createPost(link, postText, user.id);
     const { rows: lastPost } = await getLastPost(user.id);
     await createMetaData(lastPost);
-
+    
     res.sendStatus(201);
   } catch (error) {
     console.log(error);
@@ -29,6 +29,7 @@ export async function posts(req, res) {
 
     res.send(
       result.rows.map((row) => {
+        
         const [
           id,
           link,
@@ -40,6 +41,8 @@ export async function posts(req, res) {
           title,
           description,
           image,
+          userName,
+          userImage
         ] = row;
 
         return {
@@ -48,6 +51,8 @@ export async function posts(req, res) {
           postText,
           userId,
           metadata: { url, title, description, image },
+          userName,
+          userImage
         };
       })
     );
