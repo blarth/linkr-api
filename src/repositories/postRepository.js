@@ -48,26 +48,60 @@ export async function getLastPost(id) {
   );
 }
 
-export async function getPosts() {
-  return connection.query({
-    text: `SELECT posts.*,"metaData".*,users.name, users.image AS "userImage","likesPosts".like
+export async function getPosts(user) {
+  return connection.query(
+    {
+      text: `SELECT posts.*,"metaData".*,users.name, users.image AS "userImage","likesPosts".like
     FROM posts
     JOIN "metaData" 
     ON posts.id="metaData"."postId"
-    JOIN "likesPosts" 
-    ON posts.id="likesPosts"."postId"
     JOIN users
     ON posts."userId"=users.id
+    LEFT JOIN "likesPosts" 
+    ON posts.id="likesPosts"."postId" and "likesPosts"."userId"=$1
     ORDER BY posts.id DESC
     LIMIT 20 `,
-    rowMode: "array",
-  });
+      rowMode: "array",
+    },
+    [user.id]
+  );
 }
 
 export async function getPosts2() {
   return connection.query(
     `SELECT *
-      FROM posts
+    FROM posts
     `
+  );
+}
+
+export async function createLikeRelation(id, user, status) {
+  return connection.query(
+    ` 
+    INSERT INTO "likesPosts" ("userId","postId","like") VALUES ($1,$2,$3)
+    `,
+    [user.id, id, status]
+  );
+}
+
+export async function selectLikeRelation(id, user) {
+  return connection.query(
+    `
+  SELECT "likesPosts".*, posts.id FROM posts 
+  JOIN "likesPosts" 
+  ON posts.id="likesPosts"."postId" AND "likesPosts"."userId"=$1
+  WHERE posts.id=$2`,
+    [user.id, id]
+  );
+}
+
+export async function updateLikeStatus(id, user, status) {
+  return connection.query(
+    `
+  UPDATE "likesPosts"
+  SET "like"=$1
+  WHERE "likesPosts"."postId"=$2 AND "likesPosts"."userId"=$3
+  `,
+    [status, id, user.id]
   );
 }

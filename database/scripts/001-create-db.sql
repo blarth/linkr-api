@@ -28,7 +28,7 @@ CREATE TABLE "likesPosts" (
 	"id" serial NOT NULL,
 	"userId" INTEGER NOT NULL REFERENCES "users"("id"),
 	"postId" INTEGER NOT NULL REFERENCES "posts"("id"),
-	"like" BOOLEAN NOT NULL DEFAULT false
+	"like" BOOLEAN NOT NULL 
 );
 
 CREATE TABLE sessions (
