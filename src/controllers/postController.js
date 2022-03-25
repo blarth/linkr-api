@@ -3,6 +3,7 @@ import {
   getPosts,
   createMetaData,
   getLastPost,
+  getPostsById,
 } from "../repositories/postRepository.js";
 
 export async function postLink(req, res) {
@@ -26,6 +27,45 @@ export async function postLink(req, res) {
 export async function posts(req, res) {
   try {
     const result = await getPosts();
+
+    res.send(
+      result.rows.map((row) => {
+        
+        const [
+          id,
+          link,
+          postText,
+          userId,
+          metaId,
+          postId,
+          url,
+          title,
+          description,
+          image,
+          userName,
+          userImage
+        ] = row;
+
+        return {
+          id,
+          link,
+          postText,
+          userId,
+          metadata: { url, title, description, image },
+          userName,
+          userImage
+        };
+      })
+    );
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function postsById(req, res) {
+  const {id} = req.params
+  try {
+    const result = await getPostsById(id);
 
     res.send(
       result.rows.map((row) => {
