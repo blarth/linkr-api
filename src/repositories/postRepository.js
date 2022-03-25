@@ -49,12 +49,13 @@ export async function getLastPost(id) {
 
 export async function getPosts() {
   return connection.query({
-    text: `SELECT *
-      FROM posts
-      JOIN "metaData" 
-      ON posts.id="metaData"."postId"
-      ORDER BY posts.id DESC
-      LIMIT 20 `,
+    text: `SELECT posts.*,"metaData".*,"likesPosts".like
+    FROM posts
+    JOIN "metaData" 
+    ON posts.id="metaData"."postId"
+    JOIN "likesPosts" ON posts.id="likesPosts"."postId"
+    ORDER BY posts.id DESC
+    LIMIT 20 `,
     rowMode: "array",
   });
 }

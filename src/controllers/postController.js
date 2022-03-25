@@ -8,8 +8,7 @@ import {
 export async function postLink(req, res) {
   const { link, postText } = req.body;
   const { user } = res.locals;
-  const {regex} = res.locals;
-
+  const { regex } = res.locals;
 
   try {
     await createPost(link, postText, user.id);
@@ -26,6 +25,7 @@ export async function postLink(req, res) {
 export async function posts(req, res) {
   try {
     const result = await getPosts();
+    console.log(result);
 
     res.send(
       result.rows.map((row) => {
@@ -40,6 +40,7 @@ export async function posts(req, res) {
           title,
           description,
           image,
+          liked,
         ] = row;
 
         return {
@@ -48,10 +49,12 @@ export async function posts(req, res) {
           postText,
           userId,
           metadata: { url, title, description, image },
+          liked: liked,
         };
       })
     );
   } catch (error) {
     console.log(error);
+    res.sendStatus(500);
   }
 }

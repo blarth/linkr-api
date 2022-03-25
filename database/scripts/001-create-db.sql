@@ -27,7 +27,8 @@ CREATE TABLE "hashtagsPosts" (
 CREATE TABLE "likesPosts" (
 	"id" serial NOT NULL,
 	"userId" INTEGER NOT NULL REFERENCES "users"("id"),
-	"postId" INTEGER NOT NULL REFERENCES "posts"("id")
+	"postId" INTEGER NOT NULL REFERENCES "posts"("id"),
+	"like" BOOLEAN NOT NULL DEFAULT false
 );
 
 CREATE TABLE sessions (
@@ -44,3 +45,6 @@ CREATE TABLE "metaData" (
 	"description"  TEXT NOT NULL,
 	"image"  TEXT NOT NULL 
 );
+
+
+
