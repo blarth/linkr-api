@@ -13,3 +13,11 @@ export async function createSession(token, user) {
 export async function deleteSession(user) {
   return connection.query('DELETE FROM sessions WHERE "userId"=$1', [user.id]);
 }
+
+export async function getSession(token) {
+  return connection.query(`SELECT * FROM sessions WHERE token=$1`, [token]);
+}
+
+export async function getUserSession(session) {
+  return connection.query(`SELECT * FROM users WHERE id=$1`, [session.userId]);
+}
