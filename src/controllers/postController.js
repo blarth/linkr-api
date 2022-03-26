@@ -108,6 +108,7 @@ export async function posts(req, res) {
 
     res.send(
       result.rows.map((row) => {
+        
         const [
           id,
           link,
@@ -119,6 +120,8 @@ export async function posts(req, res) {
           title,
           description,
           image,
+          userName,
+          userImage
         ] = row;
 
         return {
@@ -127,6 +130,8 @@ export async function posts(req, res) {
           postText,
           userId,
           metadata: { url, title, description, image },
+          userName,
+          userImage
         };
       })
     );

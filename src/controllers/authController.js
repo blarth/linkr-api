@@ -18,7 +18,7 @@ export async function signin(req, res) {
     if (bcrypt.compareSync(password, user.password)) {
       const token = uuid();
       await createSession(token, user);
-      return res.send(token);
+      return res.send({ token: token, user: user });
     }
 
     res.sendStatus(401);
