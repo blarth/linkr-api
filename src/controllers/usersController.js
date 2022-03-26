@@ -23,5 +23,5 @@ export async function createUser(req, res) {
 export async function getUser(req, res) {
   const { user } = res.locals;
 
-  res.send({ id: user.id, image: user.image });
+  res.send({ id: user.id, image: user.image, name: user.name});
 }
