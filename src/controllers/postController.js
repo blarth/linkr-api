@@ -23,9 +23,8 @@ export async function postLink(req, res) {
     await createPost(link, postText, user.id);
     const { rows: lastPost } = await getLastPost(user.id);
     await createMetaData(lastPost);
-    res.sendStatus(201);
     if (regex.length > 0) postHashtags(lastPost[0].id, res);
-    else res.sendStatus(201);
+    else  return res.sendStatus(201);
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
