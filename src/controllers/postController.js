@@ -193,6 +193,7 @@ export async function postsById(req, res) {
           image,
           userName,
           userImage,
+          isLike,
         ] = row;
 
         return {
@@ -204,6 +205,7 @@ export async function postsById(req, res) {
           metadata: { url, title, description, image },
           userName,
           userImage,
+          isLike,
         };
       })
     );
@@ -236,6 +238,7 @@ export async function postsByHashtag(req, res) {
           image,
           userName,
           userImage,
+          isLike,
         ] = row;
 
         return {
@@ -247,6 +250,7 @@ export async function postsByHashtag(req, res) {
           metadata: { url, title, description, image },
           userName,
           userImage,
+          isLike,
         };
       })
     );
