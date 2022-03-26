@@ -1,4 +1,4 @@
-# Linktr ⛓️
+# Linkr ⛓️
 ## Share and tag links!
 
 ### :computer: Tech used
