@@ -14,3 +14,10 @@ export async function insertHashtags(str, arr){
         RETURNING *
     `, arr)
 }
+
+export async function insertHashtagsLinksMiddleTable(str, arr){
+    return connection.query(`
+        INSERT INTO "hashtagsPosts" ("hashtagId", "postId")
+        ${str}
+    `, arr)
+}

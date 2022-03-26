@@ -4,28 +4,25 @@ import {
   createMetaData,
   getLastPost,
 } from "../repositories/postRepository.js";
-import { getExistingHashtags, insertHashtags } from "../repositories/hashtagRepository.js";
+import { getExistingHashtags, insertHashtags, insertHashtagsLinksMiddleTable } from "../repositories/hashtagRepository.js";
 
 export async function postLink(req, res) {
   const { link, postText } = req.body;
   const { user } = res.locals;
   const { regex } = res.locals;
   try {
-    /*
     await createPost(link, postText, user.id);
     const { rows: lastPost } = await getLastPost(user.id);
     await createMetaData(lastPost);
-    */
-    if(regex.length > 0){
-      postHashtags(/*lastPost[0].id*/user, res);
-    }else res.sendStatus(201);
+    if(regex.length > 0) postHashtags(lastPost[0].id, res);
+    else res.sendStatus(201);
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
   }
 }
 
-async function postHashtags(id, res){
+async function postHashtags(postId, res){
   try{
     const {regex} = res.locals;
     for(let i = 0; i < regex.length; i++){
@@ -68,9 +65,9 @@ async function postHashtags(id, res){
       }
       const { rows: newHashtags } = await insertHashtags(str, arr)
       const allHashtags = [...existingHashtags, ...newHashtags]
-      res.status(200).send(allHashtags)
+      postHashtagsLinks(postId, allHashtags, res)
     }else{
-      res.status(200).send(existingHashtags)
+      postHashtagsLinks(postId, existingHashtags, res)
     }
   }catch(error){
       console.log(error);
@@ -78,8 +75,31 @@ async function postHashtags(id, res){
   }
 }
 
-async function postHashtagsLinks(){
-
+async function postHashtagsLinks(postId, hashtags, res){
+  try{
+    let str = "VALUES ";
+    const arr = [];
+    for(let i = 0; i < hashtags.length; i++){
+      arr.push(hashtags[i].id);
+      if(i < hashtags.length - 1){
+        str+=`($${arr.length}, `;
+        arr.push(postId);
+        str+=`$${arr.length}), `;
+      }
+      else{
+        str+= `($${arr.length}, `
+        arr.push(postId);
+        str+=`$${arr.length})`;
+      }
+    }
+    console.log(str)
+    console.log(arr)
+    await insertHashtagsLinksMiddleTable(str, arr)
+    res.sendStatus(201)
+  }catch(error){
+    console.log(error);
+    res.sendStatus(500);
+  }
 }
 
 export async function posts(req, res) {
