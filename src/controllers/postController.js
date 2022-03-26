@@ -174,8 +174,9 @@ export async function likePost(req, res) {
 
 export async function postsById(req, res) {
   const { id } = req.params;
+  const { user } = res.locals;
   try {
-    const result = await getPostsById(id);
+    const result = await getPostsById(id, user);
 
     res.send(
       result.rows.map((row) => {

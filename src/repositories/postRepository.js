@@ -115,11 +115,13 @@ export async function getPostsById(id) {
       ON posts.id="metaData"."postId"
       JOIN users
       ON posts."userId"=users.id
-      WHERE posts."userId"=$1
+      LEFT JOIN "likesPosts" 
+      ON posts.id="likesPosts"."postId" and "likesPosts"."userId"=$1
+      WHERE posts."userId"=$2
       ORDER BY posts.id DESC
       LIMIT 20 `,
       rowMode: "array",
     },
-    [id]
+    [id, user.id]
   );
 }
