@@ -21,3 +21,14 @@ export async function insertHashtagsLinksMiddleTable(str, arr){
         ${str}
     `, arr)
 }
+
+export async function fetchTendingHashtags(){
+	return connection.query(`
+	SELECT COUNT("hashtagId") as uses, name
+    FROM "hashtagsPosts"
+	JOIN hashtags ON "hashtagId"=hashtags.id
+	GROUP BY name
+    ORDER BY uses DESC
+	LIMIT 10
+	`)
+}
