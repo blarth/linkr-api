@@ -8,6 +8,7 @@ import {
   createLikeRelation,
   getPostsById,
   getPostsByHashtag,
+  getLikes,
 } from "../repositories/postRepository.js";
 import {
   getExistingHashtags,
@@ -114,6 +115,8 @@ export async function posts(req, res) {
   try {
     const result = await getPosts(user);
 
+    
+    
     res.send(
       result.rows.map((row) => {
         const [
@@ -142,6 +145,7 @@ export async function posts(req, res) {
           userName,
           userImage,
           isLike: isLike,
+          
         };
       })
     );
@@ -258,4 +262,13 @@ export async function postsByHashtag(req, res) {
     console.log(error);
     res.sendStatus(500);
   }
+}
+
+
+
+export async function getAllLikes(req, res){
+  
+  const {id} = req.params
+  const {rows : peopleLikes} = await getLikes(id)
+  res.send(peopleLikes)
 }

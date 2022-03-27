@@ -67,12 +67,18 @@ export async function getPosts(user) {
   );
 }
 
-export async function getPosts2() {
+export async function getLikes(postId) {
   return connection.query(
-    `SELECT *
-    FROM posts
+    `SELECT posts.id, "likesPosts".like, users.name
+    FROM "likesPosts"
+    LEFT JOIN users
+    ON users.id="likesPosts"."userId"
+    LEFT JOIN posts
+    ON posts.id="likesPosts"."postId" 
+    WHERE "likesPosts".like='t' AND posts.id=$1
+    GROUP BY users.name, posts.id, "likesPosts".like
     `
-  );
+    ,[postId]);
 }
 
 export async function createLikeRelation(id, user, status) {
@@ -117,7 +123,6 @@ export async function getPostsById(id, user) {
       ON posts."userId"=users.id
       LEFT JOIN "likesPosts" 
       ON posts.id="likesPosts"."postId" and "likesPosts"."userId"=$1
-      
       ORDER BY posts.id DESC
       LIMIT 20 `,
       rowMode: "array",
