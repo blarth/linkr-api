@@ -7,11 +7,8 @@ import {
   updateLikeStatus,
   createLikeRelation,
   getPostsById,
-<<<<<<< HEAD
-  deletePost,
-=======
   getPostsByHashtag,
->>>>>>> 3de5ad05245079b80cbaed6fc3542016bd0d995e
+  deletePost,
 } from "../repositories/postRepository.js";
 import {
   getExistingHashtags,
