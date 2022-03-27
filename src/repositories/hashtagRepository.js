@@ -38,3 +38,14 @@ export async function deleteHashtagsFromMiddleTable(str, arr, id){
         AND "postId" IN ($${arr.length + 1})
     `, [...arr, id])
 }
+
+export async function fetchTendingHashtags(){
+	return connection.query(`
+	SELECT COUNT("hashtagId") as uses, name
+    FROM "hashtagsPosts"
+	JOIN hashtags ON "hashtagId"=hashtags.id
+	GROUP BY name
+    ORDER BY uses DESC
+	LIMIT 10
+	`)
+}

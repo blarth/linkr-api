@@ -3,8 +3,10 @@ import {
   likePost,
   postLink,
   posts,
+  postsByHashtag,
   postsById,
-  editPost
+  editPost,
+  deletePosts
 } from "../controllers/postController.js";
 import postSchema from "../schemas/postSchema.js";
 import { validateTokenMiddleware } from "../middlewares/validateTokenMiddleware.js";
@@ -24,7 +26,14 @@ postRouter.post(
 );
 
 postRouter.put("/posts/:id/:status", validateTokenMiddleware, likePost);
+postRouter.get(
+  "/posts/hashtags/:name",
+  validateTokenMiddleware,
+  postsByHashtag
+);
 postRouter.get("/user/:id", validateTokenMiddleware, postsById);
+postRouter.delete("/deletepost/:id", validateTokenMiddleware, deletePosts);
+
 
 postRouter.patch("/posts/edit/:id", validateTokenMiddleware, validateSchemaMiddleware(postSchema), hashtagsRegex, editPost)
 

@@ -109,18 +109,40 @@ export async function updateLikeStatus(id, user, status) {
 export async function getPostsById(id) {
   return connection.query(
     {
-      text: `SELECT posts.*, "metaData".*, users.name, users.image AS "userImage"
+      text: `SELECT posts.*, "metaData".*, users.name, users.image AS "userImage","likesPosts".like
       FROM posts
       JOIN "metaData" 
       ON posts.id="metaData"."postId"
       JOIN users
       ON posts."userId"=users.id
-      WHERE posts."userId"=$1
+      LEFT JOIN "likesPosts" 
+      ON posts.id="likesPosts"."postId" and "likesPosts"."userId"=$1
+      WHERE posts."userId"=$2
       ORDER BY posts.id DESC
       LIMIT 20 `,
       rowMode: "array",
     },
-    [id]
+    [id, user.id]
+  );
+}
+export async function getPostsByHashtag(hashtag, user) {
+  return connection.query(
+    {
+      text: `SELECT posts.*, "metaData".*, users.name, users.image AS "userImage","likesPosts".like,hashtags.id,"hashtagsPosts".id
+      FROM posts
+      JOIN "metaData" 
+      ON posts.id="metaData"."postId"
+      JOIN users
+      ON posts."userId"=users.id
+      JOIN "hashtagsPosts" ON "hashtagsPosts"."postId"=posts.id
+      JOIN hashtags ON hashtags.id="hashtagsPosts"."hashtagId" AND hashtags.name ILIKE $1
+      LEFT JOIN "likesPosts" 
+      ON posts.id="likesPosts"."postId" and "likesPosts"."userId"=$2
+      ORDER BY posts.id DESC
+      LIMIT 20`,
+      rowMode: "array",
+    },
+    [hashtag, user.id]
   );
 }
 
@@ -138,4 +160,41 @@ export async function verifyPostOwner(userId, postId){
     WHERE "userId" = $1
     AND id = $2
   `, [userId, postId])
+}
+
+export async function deletePost(id) {
+  const deleteMetaDataById = connection.query(
+    `
+    DELETE FROM "metaData" WHERE "postId" = $1
+  `,
+    [id]
+  );
+
+  const deleteLikesPostsById = connection.query(
+    `
+    DELETE FROM "likesPosts" WHERE "postId" = $1
+  `,
+    [id]
+  );
+
+  const deleteHashtagsPostsById = connection.query(
+    `
+    DELETE FROM hashtagsPosts" WHERE "postId" = $1
+  `,
+    [id]
+  );
+
+  const deletePostById = connection.query(
+    `
+    DELETE FROM posts WHERE id = $1
+  `,
+    [id]
+  );
+
+  return{
+    deleteMetaDataById,
+    deletePostById,
+    deleteLikesPostsById,
+    deleteHashtagsPostsById
+  }
 }
