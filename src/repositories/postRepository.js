@@ -77,8 +77,9 @@ export async function getLikes(postId) {
     ON posts.id="likesPosts"."postId" 
     WHERE "likesPosts".like='t' AND posts.id=$1
     GROUP BY users.name, posts.id, "likesPosts".like
-    `
-    ,[postId]);
+    `,
+    [postId]
+  );
 }
 
 export async function createLikeRelation(id, user, status) {
@@ -180,10 +181,10 @@ export async function deletePost(id) {
     [id]
   );
 
-  return{
+  return {
     deleteMetaDataById,
     deletePostById,
     deleteLikesPostsById,
-    deleteHashtagsPostsById
-  }
+    deleteHashtagsPostsById,
+  };
 }
