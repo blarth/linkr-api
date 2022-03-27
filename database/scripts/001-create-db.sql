@@ -41,7 +41,7 @@ CREATE TABLE "metaData" (
 	"id" SERIAL PRIMARY KEY,
 	"postId" INTEGER NOT NULL REFERENCES "posts"("id"),
 	"url"  TEXT NOT NULL,
-	"title"  TEXT NOT NULL,
+	"title"  TEXT,
 	"description"  TEXT NOT NULL,
 	"image"  TEXT NOT NULL 
 );
