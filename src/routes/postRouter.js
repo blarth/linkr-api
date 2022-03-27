@@ -5,6 +5,7 @@ import {
   posts,
   postsByHashtag,
   postsById,
+  deletePosts,
 } from "../controllers/postController.js";
 import postSchema from "../schemas/postSchema.js";
 import { validateTokenMiddleware } from "../middlewares/validateTokenMiddleware.js";
@@ -30,5 +31,7 @@ postRouter.get(
   postsByHashtag
 );
 postRouter.get("/user/:id", validateTokenMiddleware, postsById);
+postRouter.delete("/deletepost/:id", validateTokenMiddleware, deletePosts);
+
 
 export default postRouter;
