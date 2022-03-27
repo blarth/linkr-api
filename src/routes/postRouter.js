@@ -3,6 +3,7 @@ import {
   likePost,
   postLink,
   posts,
+  postsByHashtag,
   postsById,
   deletePosts,
 } from "../controllers/postController.js";
@@ -24,6 +25,11 @@ postRouter.post(
 );
 
 postRouter.put("/posts/:id/:status", validateTokenMiddleware, likePost);
+postRouter.get(
+  "/posts/hashtags/:name",
+  validateTokenMiddleware,
+  postsByHashtag
+);
 postRouter.get("/user/:id", validateTokenMiddleware, postsById);
 postRouter.delete("/deletepost/:id", validateTokenMiddleware, deletePosts);
 
