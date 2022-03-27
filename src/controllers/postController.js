@@ -8,7 +8,9 @@ import {
   createLikeRelation,
   getPostsById,
   getPostsByHashtag,
+  getLikes,
   deletePost,
+
 } from "../repositories/postRepository.js";
 import {
   getExistingHashtags,
@@ -115,6 +117,8 @@ export async function posts(req, res) {
   try {
     const result = await getPosts(user);
 
+    
+    
     res.send(
       result.rows.map((row) => {
         const [
@@ -143,6 +147,7 @@ export async function posts(req, res) {
           userName,
           userImage,
           isLike: isLike,
+          
         };
       })
     );
@@ -175,9 +180,9 @@ export async function likePost(req, res) {
 
 export async function postsById(req, res) {
   const { id } = req.params;
-  const { user } = res.locals;
+  
   try {
-    const result = await getPostsById(id, user);
+    const result = await getPostsById(id);
 
     res.send(
       result.rows.map((row) => {
@@ -261,6 +266,14 @@ export async function postsByHashtag(req, res) {
   }
 }
 
+
+export async function getAllLikes(req, res){
+  
+  const {id} = req.params
+  const {rows : peopleLikes} = await getLikes(id)
+  res.send(peopleLikes)
+}
+
 export async function deletePosts(req, res) {
   const {id} = req.params;
   try {
@@ -271,3 +284,4 @@ export async function deletePosts(req, res) {
     res.sendStatus(500);
   }
 }
+
