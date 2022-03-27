@@ -3,6 +3,7 @@ import {
   likePost,
   postLink,
   posts,
+  postsByHashtag,
   postsById,
 } from "../controllers/postController.js";
 import postSchema from "../schemas/postSchema.js";
@@ -23,6 +24,11 @@ postRouter.post(
 );
 
 postRouter.put("/posts/:id/:status", validateTokenMiddleware, likePost);
+postRouter.get(
+  "/posts/hashtags/:name",
+  validateTokenMiddleware,
+  postsByHashtag
+);
 postRouter.get("/user/:id", validateTokenMiddleware, postsById);
 
 export default postRouter;

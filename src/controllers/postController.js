@@ -7,6 +7,7 @@ import {
   updateLikeStatus,
   createLikeRelation,
   getPostsById,
+  getPostsByHashtag,
 } from "../repositories/postRepository.js";
 import {
   getExistingHashtags,
@@ -24,7 +25,7 @@ export async function postLink(req, res) {
     const { rows: lastPost } = await getLastPost(user.id);
     await createMetaData(lastPost);
     if (regex.length > 0) postHashtags(lastPost[0].id, res);
-    else  return res.sendStatus(201);
+    else return res.sendStatus(201);
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
@@ -173,8 +174,9 @@ export async function likePost(req, res) {
 
 export async function postsById(req, res) {
   const { id } = req.params;
+  const { user } = res.locals;
   try {
-    const result = await getPostsById(id);
+    const result = await getPostsById(id, user);
 
     res.send(
       result.rows.map((row) => {
@@ -191,20 +193,69 @@ export async function postsById(req, res) {
           image,
           userName,
           userImage,
+          isLike,
         ] = row;
 
         return {
           id,
           link,
           postText,
+          postId,
           userId,
           metadata: { url, title, description, image },
           userName,
           userImage,
+          isLike,
         };
       })
     );
   } catch (error) {
     console.log(error);
+    res.sendStatus(500);
+  }
+}
+
+export async function postsByHashtag(req, res) {
+  const { user } = res.locals;
+  let { name: hashtag } = req.params;
+  hashtag.trim();
+  hashtag = `#${hashtag}`;
+  try {
+    const result = await getPostsByHashtag(hashtag, user);
+
+    res.send(
+      result.rows.map((row) => {
+        const [
+          id,
+          link,
+          postText,
+          userId,
+          metaId,
+          postId,
+          url,
+          title,
+          description,
+          image,
+          userName,
+          userImage,
+          isLike,
+        ] = row;
+
+        return {
+          id,
+          link,
+          postText,
+          postId,
+          userId,
+          metadata: { url, title, description, image },
+          userName,
+          userImage,
+          isLike,
+        };
+      })
+    );
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
   }
 }
