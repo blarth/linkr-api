@@ -1,4 +1,4 @@
-CREATE TABLE users (
+CREATE TABLE "users" (
 	"id" SERIAL PRIMARY KEY,
 	"name" TEXT NOT NULL,
 	"email" TEXT NOT NULL UNIQUE,
@@ -6,14 +6,14 @@ CREATE TABLE users (
 	"image" TEXT NOT NULL
 );
 
-CREATE TABLE posts (
+CREATE TABLE "posts" (
 	"id" SERIAL PRIMARY KEY,
 	"link" TEXT NOT NULL,
 	"postText" TEXT,
 	"userId" INTEGER NOT NULL REFERENCES "users"("id")
 );
 
-CREATE TABLE hashtags (
+CREATE TABLE "hashtags" (
 	"id" SERIAL PRIMARY KEY,
 	"name" TEXT NOT NULL UNIQUE
 );
@@ -31,7 +31,7 @@ CREATE TABLE "likesPosts" (
 	"like" BOOLEAN NOT NULL 
 );
 
-CREATE TABLE sessions (
+CREATE TABLE "sessions" (
    "id" SERIAL PRIMARY KEY,
    "token" TEXT NOT NULL UNIQUE,
    "userId" INTEGER NOT NULL REFERENCES "users"("id")
