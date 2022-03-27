@@ -123,3 +123,40 @@ export async function getPostsById(id) {
     [id]
   );
 }
+
+export async function deletePost(id) {
+  const deleteMetaDataById = connection.query(
+    `
+    DELETE FROM "metaData" WHERE "postId" = $1
+  `,
+    [id]
+  );
+
+  const deleteLikesPostsById = connection.query(
+    `
+    DELETE FROM "likesPosts" WHERE "postId" = $1
+  `,
+    [id]
+  );
+
+  const deleteHashtagsPostsById = connection.query(
+    `
+    DELETE FROM hashtagsPosts" WHERE "postId" = $1
+  `,
+    [id]
+  );
+
+  const deletePostById = connection.query(
+    `
+    DELETE FROM posts WHERE id = $1
+  `,
+    [id]
+  );
+
+  return{
+    deleteMetaDataById,
+    deletePostById,
+    deleteLikesPostsById,
+    deleteHashtagsPostsById
+  }
+}

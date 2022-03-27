@@ -7,6 +7,7 @@ import {
   updateLikeStatus,
   createLikeRelation,
   getPostsById,
+  deletePost,
 } from "../repositories/postRepository.js";
 import {
   getExistingHashtags,
@@ -207,5 +208,16 @@ export async function postsById(req, res) {
     );
   } catch (error) {
     console.log(error);
+  }
+}
+
+export async function deletePosts(req, res) {
+  const {id} = req.params;
+  try {
+    await deletePost(id);
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
   }
 }

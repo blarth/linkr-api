@@ -4,6 +4,7 @@ import {
   postLink,
   posts,
   postsById,
+  deletePosts,
 } from "../controllers/postController.js";
 import postSchema from "../schemas/postSchema.js";
 import { validateTokenMiddleware } from "../middlewares/validateTokenMiddleware.js";
@@ -24,5 +25,7 @@ postRouter.post(
 
 postRouter.put("/posts/:id/:status", validateTokenMiddleware, likePost);
 postRouter.get("/user/:id", validateTokenMiddleware, postsById);
+postRouter.delete("/deletepost/:id", validateTokenMiddleware, deletePosts);
+
 
 export default postRouter;
