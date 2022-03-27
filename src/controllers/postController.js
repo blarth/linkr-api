@@ -9,6 +9,8 @@ import {
   getPostsById,
   getPostsByHashtag,
   getLikes,
+  deletePost,
+
 } from "../repositories/postRepository.js";
 import {
   getExistingHashtags,
@@ -265,10 +267,21 @@ export async function postsByHashtag(req, res) {
 }
 
 
-
 export async function getAllLikes(req, res){
   
   const {id} = req.params
   const {rows : peopleLikes} = await getLikes(id)
   res.send(peopleLikes)
 }
+
+export async function deletePosts(req, res) {
+  const {id} = req.params;
+  try {
+    await deletePost(id);
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}
+
