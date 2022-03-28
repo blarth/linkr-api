@@ -11,6 +11,9 @@ import {
   verifyPostOwner,
   getPostsByHashtag,
   getLikes,
+  deleteMetaData,
+  deleteHashtagsPost,
+  deleteLikesPost,
   deletePost,
 
 } from "../repositories/postRepository.js";
@@ -281,6 +284,9 @@ export async function getAllLikes(req, res){
 export async function deletePosts(req, res) {
   const {id} = req.params;
   try {
+    await deleteMetaData(id);
+    await deleteHashtagsPost(id);
+    await deleteLikesPost(id);
     await deletePost(id);
     res.sendStatus(200);
   } catch (error) {
