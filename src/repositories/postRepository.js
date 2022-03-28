@@ -163,7 +163,7 @@ export async function deletePost(id) {
 
   const deleteHashtagsPostsById = connection.query(
     `
-    DELETE FROM hashtagsPosts" WHERE "postId" = $1
+    DELETE FROM "hashtagsPosts" WHERE "postId" = $1
   `,
     [id]
   );
