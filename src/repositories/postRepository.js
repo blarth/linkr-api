@@ -152,6 +152,22 @@ export async function getPostsByHashtag(hashtag, user) {
   );
 }
 
+export async function editPostText(txt, id){
+  return connection.query(`
+      UPDATE "posts"
+      SET "postText" = $1
+      WHERE "id" = $2
+  `, [txt, id])
+}
+
+export async function verifyPostOwner(userId, postId){
+  return connection.query(`
+    SELECT * FROM "posts"
+    WHERE "userId" = $1
+    AND id = $2
+  `, [userId, postId])
+}
+
 export async function deletePost(id) {
   const deleteMetaDataById = connection.query(
     `

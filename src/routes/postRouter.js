@@ -6,7 +6,8 @@ import {
   posts,
   postsByHashtag,
   postsById,
-  deletePosts,
+  editPost,
+  deletePosts
 } from "../controllers/postController.js";
 import postSchema from "../schemas/postSchema.js";
 import { validateTokenMiddleware } from "../middlewares/validateTokenMiddleware.js";
@@ -36,6 +37,7 @@ postRouter.get("/user/:id", validateTokenMiddleware, postsById);
 postRouter.delete("/deletepost/:id", validateTokenMiddleware, deletePosts);
 
 
+postRouter.patch("/posts/edit/:id", validateTokenMiddleware, validateSchemaMiddleware(postSchema), hashtagsRegex, editPost)
 postRouter.get("/likes/:id", getAllLikes)
 
 export default postRouter;
