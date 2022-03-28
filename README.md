@@ -54,13 +54,43 @@ psql
 
 ### All requests are HTTP based
 
-#### ```POST /login, /signup, /auth, /logout```
+#### ```POST /signup, /signin, DELETE /signout```
 
-work in progress
+Authenticating related routes. Send requests of the respective types with the following:
 
-#### ```POST /messages```
+To signup:
 
-work in progress
+{
+
+	email: any email,
+	password: no restrictions, it will be stored encrypted,
+	username: name with which the user will be identified,
+	image: link to an image file, it will be shown as the user's avatar, supported extensions are png, jpg, jpeg, jfif, gif
+
+}
+
+To signin:
+
+{
+
+	email: email used to signup,
+	password: password chosen upon signup
+
+}
+
+The server will respond with a token, to be used on every other route where authetication is required. Use in the headers of your requests as:
+
+{
+
+	Authorization: Bearer <GIVEN_TOKEN>
+
+}
+
+To signout, simply send the request with a header containing the Authorization key above.
+
+#### ```GET /timeline, /hashtags, POST /messages```
+
+With the auth header, send the request to timeline to get all posts from all users, most recent first, and hashtags, to get the trending hashtags, most used first.
 
 #### ```GET /users, /hashtags, /posts```
 
