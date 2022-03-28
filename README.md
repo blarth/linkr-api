@@ -54,18 +54,77 @@ psql
 
 ### All requests are HTTP based
 
-#### ```POST /login, /signup, /auth, /logout```
+#### ```POST /signup, /signin, DELETE /signout```
 
-work in progress
+Authenticating related routes. Send requests of the respective types with the following:
 
-#### ```POST /messages```
+To signup:
 
-work in progress
+{
 
-#### ```GET /users, /hashtags, /posts```
+	email: any email,
+	password: no restrictions, it will be stored encrypted,
+	username: name with which the user will be identified,
+	image: link to an image file, it will be shown as the user's avatar, supported extensions are png, jpg, jpeg, jfif, gif
 
-work in progress
+}
 
+To signin:
+
+{
+
+	email: email used to signup,
+	password: password chosen upon signup
+
+}
+
+The server will respond with a token, to be used on every other route where authetication is required. Use in the headers of your requests as:
+
+{
+
+	Authorization: Bearer <GIVEN_TOKEN>
+
+}
+
+To signout, simply send the request with a header containing the Authorization key above.
+
+#### ```GET /timeline, /hashtags, POST /timeline```
+
+Routes without params.
+
+With the auth header, send the request to timeline to get all posts from all users, most recent first, and hashtags, to get the trending hashtags, ten most used first. To post a link, send request to timeline, as a logged user, with the following:
+
+{
+
+	link: the link you want to share,
+	postText: the text to give it context, you can post hashtags by using # before a word.
+
+}
+
+Resquests with params:
+#### ```PUT /posts/:id/:status```
+
+Send a request with the post id and the current status it has, liked or not. The server will like the post or remove it, adding or removing your user from the list of people who liked it.
+
+#### ```GET /posts/hashtags/:name```
+
+Get all posts containing the <:NAME> hashtag (without the #)
+
+#### ```GET /posts/user/:name```
+
+Get all posts from user <:NAME>
+
+#### ```DELETE /deletepost/:id```
+
+As a logged user and publisher of the post, send the request to delete it, with the id given.
+
+#### ```PATCH /posts/edit/:id```
+
+As a logged user and publisher of the post, you can edit it by sending a request with it's id. Any hashtags removed will lose a score in the trending ranking, any added will gain a score, and remaining ones are unaltered.
+
+#### ```GET /likes/:id```
+
+Get all likes from post with id <:ID>
 ### :man_technologist: Authors
 <p>Made with care by</p>
 <a href="https://github.com/blarth"><img  style="border-radius: 50%;"  src="https://avatars.githubusercontent.com/u/79117658?v=4"  width="100px;"  alt="João Marcos Inocente"/></a>

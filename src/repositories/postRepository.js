@@ -113,7 +113,7 @@ export async function updateLikeStatus(id, user, status) {
   );
 }
 
-export async function getPostsById(id, user) {
+export async function getPostsById(id) {
   return connection.query(
     {
       text: `SELECT posts.*, "metaData".*, users.name, users.image AS "userImage","likesPosts".like
@@ -124,6 +124,7 @@ export async function getPostsById(id, user) {
       ON posts."userId"=users.id
       LEFT JOIN "likesPosts" 
       ON posts.id="likesPosts"."postId" and "likesPosts"."userId"=$1
+      WHERE users.id=$1
       ORDER BY posts.id DESC
       LIMIT 20 `,
       rowMode: "array",
