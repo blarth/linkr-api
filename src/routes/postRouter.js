@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  getAllLikes,
   likePost,
   postLink,
   posts,
@@ -12,6 +13,7 @@ import postSchema from "../schemas/postSchema.js";
 import { validateTokenMiddleware } from "../middlewares/validateTokenMiddleware.js";
 import validateSchemaMiddleware from "../middlewares/validateSchemaMiddleware.js";
 import hashtagsRegex from "../middlewares/validateHashtagMiddleware.js";
+
 
 const postRouter = Router();
 
@@ -36,5 +38,6 @@ postRouter.delete("/deletepost/:id", validateTokenMiddleware, deletePosts);
 
 
 postRouter.patch("/posts/edit/:id", validateTokenMiddleware, validateSchemaMiddleware(postSchema), hashtagsRegex, editPost)
+postRouter.get("/likes/:id", getAllLikes)
 
 export default postRouter;
