@@ -48,7 +48,7 @@ export async function getLastPost(id) {
   );
 }
 
-export async function getPosts(user) {
+export async function getPosts(user, offset) {
   return connection.query(
     {
       text: `SELECT posts.*,"metaData".*,users.name, users.image AS "userImage","likesPosts".like
@@ -60,7 +60,9 @@ export async function getPosts(user) {
     LEFT JOIN "likesPosts" 
     ON posts.id="likesPosts"."postId" and "likesPosts"."userId"=$1
     ORDER BY posts.id DESC
-    LIMIT 20 `,
+    LIMIT 10
+    ${offset}
+     `,
       rowMode: "array",
     },
     [user.id]
