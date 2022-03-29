@@ -17,7 +17,7 @@ import hashtagsRegex from "../middlewares/validateHashtagMiddleware.js";
 
 const postRouter = Router();
 
-postRouter.get("/timeline", validateTokenMiddleware, posts);
+postRouter.get("/timeline/:offset?", validateTokenMiddleware, posts);
 
 postRouter.post(
   "/timeline",

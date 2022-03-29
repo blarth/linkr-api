@@ -121,8 +121,10 @@ async function postHashtagsLinks(postId, hashtags, res) {
 
 export async function posts(req, res) {
   const { user } = res.locals;
+  const {offset} = req.params;
+  const offsetString = `OFFSET ${offset}`
   try {
-    const result = await getPosts(user);
+    const result = await getPosts(user, offsetString);
 
     
     
