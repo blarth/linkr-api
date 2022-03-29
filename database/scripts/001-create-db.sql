@@ -46,5 +46,21 @@ CREATE TABLE "metaData" (
 	"image"  TEXT NOT NULL 
 );
 
+CREATE TABLE "followers"(
+	"id" SERIAL PRIMARY KEY,
+	"userId" INTEGER NOT NULL REFERENCES "users"("id"),
+	"followedByUserId" INTEGER NOT NULL REFERENCES "users"("id")
+);
 
+CREATE TABLE "comments"(
+	"id" SERIAL PRIMARY KEY,
+	"postId" INTEGER NOT NULL REFERENCES "posts"("id"),
+	"comment" TEXT NOT NULL,
+	"userId" INTEGER NOT NULL REFERENCES "users"("id")
+);
 
+CREATE TABLE "shares"(
+	"id" SERIAL PRIMARY KEY,
+	"postId" INTEGER NOT NULL REFERENCES "posts"("id"),
+	"userId" INTEGER NOT NULL REFERENCES "users"("id")
+);
