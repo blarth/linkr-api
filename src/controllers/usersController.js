@@ -4,6 +4,7 @@ import {
   followUserById,
   verifyFollower,
   unfollowUser,
+  checkFollowing,
 } from "../repositories/userRepository.js";
 import bcrypt from "bcrypt";
 
@@ -56,6 +57,17 @@ export async function getFollower(req, res) {
   try {
     const { rows: followers } = await verifyFollower(id, user.id);
     res.send(followers);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}
+export async function checkFollowings(req, res) {
+  const { user } = res.locals;
+
+  try {
+    const { rows: result } = await checkFollowing(user.id);
+    res.send(result[0]);
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
