@@ -134,6 +134,12 @@ export async function getPostsById(userId, id) {
     [userId, id]
   );
 }
+export async function getUserById(id) {
+  return connection.query(
+    `SELECT name AS "userName", users.image AS "userImage" FROM users WHERE id=$1`,
+    [id]
+  );
+}
 export async function getPostsByHashtag(hashtag, user) {
   return connection.query(
     {

@@ -36,3 +36,10 @@ export async function verifyFollower(idFollowed, idFollower) {
     [idFollowed, idFollower]
   );
 }
+
+export async function checkFollowing(id) {
+  return connection.query(
+    `SELECT id FROM followers WHERE "followedByUserId"=$1`,
+    [id]
+  );
+}

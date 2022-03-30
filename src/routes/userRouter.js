@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  checkFollowings,
   createUser,
   followUser,
   getFollower,
@@ -20,4 +21,5 @@ userRouter.post(
   followUser
 );
 userRouter.get("/users/follow/:id", validateTokenMiddleware, getFollower);
+userRouter.get("/users/following", validateTokenMiddleware, checkFollowings);
 export default userRouter;
