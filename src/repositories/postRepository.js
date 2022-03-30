@@ -51,7 +51,7 @@ export async function getLastPost(id) {
 export async function getPosts(user) {
   return connection.query(
     {
-      text: `SELECT posts.*,"metaData".*,users.name, users.image AS "userImage","likesPosts".like
+      text: `SELECT posts.*, "metaData".*,users.name, users.image AS "userImage","likesPosts".like
     FROM posts
     JOIN "metaData" 
     ON posts.id="metaData"."postId"
