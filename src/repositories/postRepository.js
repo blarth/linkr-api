@@ -48,7 +48,7 @@ export async function getLastPost(id) {
   );
 }
 
-export async function getPosts(user) {
+export async function getPosts(user, offset) {
   return connection.query(
     {
       text: `SELECT posts.*, "metaData".*,users.name, users.image AS "userImage","likesPosts".like
@@ -59,8 +59,12 @@ export async function getPosts(user) {
     ON posts."userId"=users.id
     LEFT JOIN "likesPosts" 
     ON posts.id="likesPosts"."postId" and "likesPosts"."userId"=$1
+    JOIN followers 
+    ON followers."followedByUserId"=$1
     ORDER BY posts.id DESC
-    LIMIT 20 `,
+    LIMIT 10
+    ${offset}
+     `,
       rowMode: "array",
     },
     [user.id]
@@ -113,7 +117,7 @@ export async function updateLikeStatus(id, user, status) {
   );
 }
 
-export async function getPostsById(id) {
+export async function getPostsById(userId, id) {
   return connection.query(
     {
       text: `SELECT posts.*, "metaData".*, users.name, users.image AS "userImage","likesPosts".like
@@ -124,11 +128,17 @@ export async function getPostsById(id) {
       ON posts."userId"=users.id
       LEFT JOIN "likesPosts" 
       ON posts.id="likesPosts"."postId" and "likesPosts"."userId"=$1
-      WHERE users.id=$1
+      WHERE users.id=$2
       ORDER BY posts.id DESC
       LIMIT 20 `,
       rowMode: "array",
     },
+    [userId, id]
+  );
+}
+export async function getUserById(id) {
+  return connection.query(
+    `SELECT name AS "userName", users.image AS "userImage" FROM users WHERE id=$1`,
     [id]
   );
 }
@@ -153,56 +163,63 @@ export async function getPostsByHashtag(hashtag, user) {
   );
 }
 
-export async function editPostText(txt, id){
-  return connection.query(`
+export async function editPostText(txt, id) {
+  return connection.query(
+    `
       UPDATE "posts"
       SET "postText" = $1
       WHERE "id" = $2
-  `, [txt, id])
+  `,
+    [txt, id]
+  );
 }
 
-export async function verifyPostOwner(userId, postId){
-  return connection.query(`
+export async function verifyPostOwner(userId, postId) {
+  return connection.query(
+    `
     SELECT * FROM "posts"
     WHERE "userId" = $1
     AND id = $2
-  `, [userId, postId])
+  `,
+    [userId, postId]
+  );
 }
 
 export async function deleteMetaData(id) {
-  return connection.query (
+  return connection.query(
     `
     DELETE FROM "metaData" WHERE "postId" = $1
-  `,[id]
+  `,
+    [id]
   );
 }
 
 export async function deleteHashtagsPost(id) {
-  return connection.query (
+  return connection.query(
     `
     DELETE FROM "hashtagsPosts" WHERE "postId" = $1
-  `,[id]
+  `,
+    [id]
   );
 }
 
 export async function deleteLikesPost(id) {
-  return connection.query (
+  return connection.query(
     `
     DELETE FROM "likesPosts" WHERE "postId" = $1
-  `,[id]
+  `,
+    [id]
   );
 }
 
 export async function deletePost(id) {
-  return connection.query (
+  return connection.query(
     `
     DELETE FROM posts WHERE id = $1
-  `,[id]
+  `,
+    [id]
   );
 }
-
-
-
 
 // export async function deletePost(id) {
 //   const deleteMetaDataById = connection.query(

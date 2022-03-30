@@ -15,15 +15,15 @@ import {
   deleteHashtagsPost,
   deleteLikesPost,
   deletePost,
-
 } from "../repositories/postRepository.js";
 import {
   getExistingHashtags,
   insertHashtags,
   insertHashtagsLinksMiddleTable,
   getPreviousHashtags,
-  deleteHashtagsFromMiddleTable
+  deleteHashtagsFromMiddleTable,
 } from "../repositories/hashtagRepository.js";
+import { createRepost, getReposts, numberReposts } from "../repositories/repostRepository.js";
 
 export async function postLink(req, res) {
   const { link, postText } = req.body;
@@ -119,13 +119,14 @@ async function postHashtagsLinks(postId, hashtags, res) {
 
 export async function posts(req, res) {
   const { user } = res.locals;
+  const { offset } = req.params;
+  const offsetString = `OFFSET ${offset}`;
   try {
-    const result = await getPosts(user);
+    const result = await getPosts(user, offsetString);
 
-    
-    
     res.send(
       result.rows.map((row) => {
+        
         const [
           id,
           link,
@@ -141,6 +142,8 @@ export async function posts(req, res) {
           userName,
           userImage,
           isLike,
+          repostId,
+          respostUserId
         ] = row;
 
         return {
@@ -154,7 +157,8 @@ export async function posts(req, res) {
           userName,
           userImage,
           isLike: isLike,
-          
+          repostId,
+          respostUserId,
         };
       })
     );
@@ -187,9 +191,9 @@ export async function likePost(req, res) {
 
 export async function postsById(req, res) {
   const { id } = req.params;
-  
+  const { user } = res.locals;
   try {
-    const result = await getPostsById(id);
+    const result = await getPostsById(user.id, id);
 
     res.send(
       result.rows.map((row) => {
@@ -273,16 +277,14 @@ export async function postsByHashtag(req, res) {
   }
 }
 
-
-export async function getAllLikes(req, res){
-  
-  const {id} = req.params
-  const {rows : peopleLikes} = await getLikes(id)
-  res.send(peopleLikes)
+export async function getAllLikes(req, res) {
+  const { id } = req.params;
+  const { rows: peopleLikes } = await getLikes(id);
+  res.send(peopleLikes);
 }
 
 export async function deletePosts(req, res) {
-  const {id} = req.params;
+  const { id } = req.params;
   try {
     await deleteMetaData(id);
     await deleteHashtagsPost(id);
@@ -295,12 +297,12 @@ export async function deletePosts(req, res) {
   }
 }
 
-export async function editPost(req, res){
-  try{
+export async function editPost(req, res) {
+  try {
     const user = res.locals.user;
-    const verified = await verifyPostOwner(user.id, req.params.id)
-    if(verified.rowCount < 1){
-      return res.sendStatus(401)
+    const verified = await verifyPostOwner(user.id, req.params.id);
+    if (verified.rowCount < 1) {
+      return res.sendStatus(401);
     }
     const { regex } = res.locals;
     for (let i = 0; i < regex.length; i++) {
@@ -309,15 +311,15 @@ export async function editPost(req, res){
         i--;
       }
     }
-    const { rows: lastHashtags } = await getPreviousHashtags(req.params.id)
+    const { rows: lastHashtags } = await getPreviousHashtags(req.params.id);
 
-    const hashtagsToAdd = [...regex]
+    const hashtagsToAdd = [...regex];
     for (let i = 0; i < lastHashtags.length; i++) {
-      if(hashtagsToAdd.includes(lastHashtags[i].name)){
+      if (hashtagsToAdd.includes(lastHashtags[i].name)) {
         hashtagsToAdd.splice(hashtagsToAdd.indexOf(lastHashtags[i].name), 1);
       }
     }
-    
+
     let str = "WHERE ";
     let firstTime = true;
     let arr = [];
@@ -331,23 +333,23 @@ export async function editPost(req, res){
         str += ` OR name = $${arr.length}`;
       }
     }
-    
-    if(hashtagsToAdd.length > 0){
+
+    if (hashtagsToAdd.length > 0) {
       const { rows: existingHashtags } = await getExistingHashtags(str, arr);
 
-      const hashtagsToAddMiddleOnly = []
-      for(let i = 0; i < existingHashtags.length; i++){
-        hashtagsToAddMiddleOnly.push(existingHashtags[i].name)
+      const hashtagsToAddMiddleOnly = [];
+      for (let i = 0; i < existingHashtags.length; i++) {
+        hashtagsToAddMiddleOnly.push(existingHashtags[i].name);
       }
-      
+
       const hashtagsToAddToDbAndMiddle = [];
-      for(let i = 0; i < hashtagsToAdd.length; i++){
-        if(!hashtagsToAddMiddleOnly.includes(hashtagsToAdd[i])){
-          hashtagsToAddToDbAndMiddle.push(hashtagsToAdd[i])
+      for (let i = 0; i < hashtagsToAdd.length; i++) {
+        if (!hashtagsToAddMiddleOnly.includes(hashtagsToAdd[i])) {
+          hashtagsToAddToDbAndMiddle.push(hashtagsToAdd[i]);
         }
       }
-      
-      let finalHashtags = [...existingHashtags]
+
+      let finalHashtags = [...existingHashtags];
       if (hashtagsToAddToDbAndMiddle.length > 0) {
         str = "VALUES ";
         arr = [];
@@ -359,11 +361,11 @@ export async function editPost(req, res){
             str += `($${arr.length})`;
           }
         }
-        
+
         const { rows: newHashtags } = await insertHashtags(str, arr);
-        finalHashtags = [...finalHashtags, ...newHashtags]
+        finalHashtags = [...finalHashtags, ...newHashtags];
       }
-      
+
       str = "VALUES ";
       arr = [];
       for (let i = 0; i < finalHashtags.length; i++) {
@@ -378,38 +380,108 @@ export async function editPost(req, res){
           str += `$${arr.length})`;
         }
       }
-      await insertHashtagsLinksMiddleTable(str, arr)
+      await insertHashtagsLinksMiddleTable(str, arr);
     }
-    
+
     const hashtagsToRemove = [];
-    for(let i = 0; i < lastHashtags.length; i++){
-      if(!regex.includes(lastHashtags[i].name)){
-        hashtagsToRemove.push(lastHashtags[i])
+    for (let i = 0; i < lastHashtags.length; i++) {
+      if (!regex.includes(lastHashtags[i].name)) {
+        hashtagsToRemove.push(lastHashtags[i]);
       }
     }
-    
-    if(hashtagsToRemove.length > 0){
+
+    if (hashtagsToRemove.length > 0) {
       str = "(";
       arr = [];
       firstTime = true;
       for (let i = 0; i < hashtagsToRemove.length; i++) {
-        if(i == hashtagsToRemove.length - 1){
+        if (i == hashtagsToRemove.length - 1) {
           arr.push(hashtagsToRemove[i].hashtagId);
-          str += `$${arr.length})`
-        }else{
+          str += `$${arr.length})`;
+        } else {
           arr.push(hashtagsToRemove[i].hashtagId);
-          str += `$${arr.length}, `
+          str += `$${arr.length}, `;
         }
       }
-      await deleteHashtagsFromMiddleTable(str, arr, req.params.id)
+      await deleteHashtagsFromMiddleTable(str, arr, req.params.id);
     }
 
-    await editPostText(req.body.postText, req.params.id)
+    await editPostText(req.body.postText, req.params.id);
 
-    res.sendStatus(200)
-
-  }catch(error){
+    res.sendStatus(200);
+  } catch (error) {
     console.log(error);
     res.sendStatus(500);
   }
 }
+
+
+export async function createReposts(req, res){
+  const {user} = res.locals
+  const {id} = req.params
+
+  try {
+    await createRepost(id, user.id)
+    res.sendStatus(201)
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+
+}
+
+export async function reposts(req, res) {
+  const { user } = res.locals;
+  const {offset} = req.params;
+  const offsetString = `OFFSET ${offset}`
+  try {
+    const result = await getReposts(user, offsetString);
+
+    res.send(
+      result.rows.map(async (row) => {
+        
+        const [
+          id,
+          link,
+          postText,
+          userId,
+          metaId,
+          postId,
+          url,
+          title,
+          description,
+          image,
+          userName,
+          userImage,
+          isLike,
+          repostId,
+          respostUserId
+        ] = row;
+
+        try {
+          const {rows : numberRepost} = await numberReposts(id)
+          console.log(numberRepost)
+        } catch (error) {
+          console.log(error)
+        }
+        return {
+          id,
+          link,
+          postText,
+          postId,
+          userId,
+          metadata: { url, title, description, image },
+          userName,
+          userImage,
+          isLike: isLike,
+          repostId,
+          respostUserId,
+        };
+      })
+    );
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}
+
