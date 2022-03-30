@@ -23,6 +23,7 @@ import {
   getPreviousHashtags,
   deleteHashtagsFromMiddleTable,
 } from "../repositories/hashtagRepository.js";
+import { createRepost, getReposts, numberReposts } from "../repositories/repostRepository.js";
 
 export async function postLink(req, res) {
   const { link, postText } = req.body;
@@ -127,6 +128,7 @@ export async function posts(req, res) {
 
     res.send(
       result.rows.map((row) => {
+        
         const [
           id,
           link,
@@ -141,6 +143,8 @@ export async function posts(req, res) {
           userName,
           userImage,
           isLike,
+          repostId,
+          respostUserId
         ] = row;
 
         return {
@@ -153,6 +157,8 @@ export async function posts(req, res) {
           userName,
           userImage,
           isLike: isLike,
+          repostId,
+          respostUserId,
         };
       })
     );
@@ -408,3 +414,74 @@ export async function editPost(req, res) {
     res.sendStatus(500);
   }
 }
+
+
+export async function createReposts(req, res){
+  const {user} = res.locals
+  const {id} = req.params
+
+  try {
+    await createRepost(id, user.id)
+    res.sendStatus(201)
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+
+}
+
+export async function reposts(req, res) {
+  const { user } = res.locals;
+  const {offset} = req.params;
+  const offsetString = `OFFSET ${offset}`
+  try {
+    const result = await getReposts(user, offsetString);
+
+    res.send(
+      result.rows.map(async (row) => {
+        
+        const [
+          id,
+          link,
+          postText,
+          userId,
+          metaId,
+          postId,
+          url,
+          title,
+          description,
+          image,
+          userName,
+          userImage,
+          isLike,
+          repostId,
+          respostUserId
+        ] = row;
+
+        try {
+          const {rows : numberRepost} = await numberReposts(id)
+          console.log(numberRepost)
+        } catch (error) {
+          console.log(error)
+        }
+        return {
+          id,
+          link,
+          postText,
+          postId,
+          userId,
+          metadata: { url, title, description, image },
+          userName,
+          userImage,
+          isLike: isLike,
+          repostId,
+          respostUserId,
+        };
+      })
+    );
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}
+
