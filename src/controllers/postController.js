@@ -132,7 +132,7 @@ export async function posts(req, res) {
           link,
           postText,
           userId,
-          numberOfComments,
+          
           metaId,
           postId,
           url,
@@ -152,7 +152,7 @@ export async function posts(req, res) {
           postText,
           postId,
           userId,
-          numberOfComments,
+          
           metadata: { url, title, description, image },
           userName,
           userImage,
