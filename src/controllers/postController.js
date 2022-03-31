@@ -23,11 +23,7 @@ import {
   getPreviousHashtags,
   deleteHashtagsFromMiddleTable,
 } from "../repositories/hashtagRepository.js";
-import {
-  createRepost,
-  getReposts,
-  numberReposts,
-} from "../repositories/repostRepository.js";
+
 import { getUserById } from "../repositories/userRepository.js";
 
 export async function postLink(req, res) {
@@ -128,9 +124,10 @@ export async function posts(req, res) {
   const offsetString = `OFFSET ${offset}`;
   try {
     const result = await getPosts(user, offsetString);
-
+    
     res.send(
       result.rows.map((row) => {
+        
         const [
           id,
           link,
@@ -146,20 +143,25 @@ export async function posts(req, res) {
           userImage,
           isLike,
           numberReposts,
-        ] = row;
+          sharerName,
+          sharerId
 
+        ] = row;
+        
         return {
           id,
           link,
           postText,
           postId,
           userId,
-
           metadata: { url, title, description, image },
           userName,
           userImage,
           isLike: isLike,
           numberReposts,
+          
+          sharerName,
+          sharerId
         };
       })
     );

@@ -5,8 +5,8 @@ export async function createRepost(postId, userId) {
     return connection.query(
       ` 
       INSERT INTO 
-      shares ("postId", "userId")
-      VALUES ($1, $2)
+      shares ("postId", "userId", "userName")
+      VALUES ($1, $2, (SELECT users.name from users where users.id=$2))
       `,
       [postId, userId]
     );
@@ -34,28 +34,6 @@ export async function createRepost(postId, userId) {
     );
   }
 
-  export async function getReposts(user, offset) {
-    return connection.query(
-      {
-        text: `SELECT posts.*,"metaData".*,users.name, users.image AS "userImage","likesPosts".like, shares.id, shares."userId"
-      FROM posts
-      JOIN "metaData" 
-      ON posts.id="metaData"."postId"
-      JOIN users
-      ON posts."userId"=users.id
-      LEFT JOIN "likesPosts" 
-      ON posts.id="likesPosts"."postId" and "likesPosts"."userId"=$1
-      LEFT JOIN shares
-      ON shares."postId"=posts.id
-      ORDER BY posts.id DESC
-      LIMIT 10
-      ${offset}
-       `,
-        rowMode: "array",
-      },
-      [user.id]
-    );
-  }
 
 
 export async function numberReposts([postId]){
