@@ -60,6 +60,7 @@ export async function getPosts(user, offset) {
     ON posts."userId"=users.id 
     LEFT JOIN "likesPosts" 
     ON posts.id="likesPosts"."postId" and "likesPosts"."userId"=$1
+    JOIN followers
     ON followers."followedByUserId"=users.id
     WHERE followers."userId"=$1
     ORDER BY posts.id DESC 
