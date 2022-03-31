@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { validateTokenMiddleware } from "../middlewares/validateTokenMiddleware.js";
-import { searchBarUsers } from "../controllers/searchBarController.js";
+import { getSearchBar } from "../controllers/searchBarController.js";
 
 const searchBarRouter = Router();
-searchBarRouter.get("/searchbar/:name", validateTokenMiddleware, searchBarUsers);
+searchBarRouter.get("/searchbar/:name", validateTokenMiddleware, getSearchBar);
 
 
 export default searchBarRouter;

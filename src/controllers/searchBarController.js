@@ -1,9 +1,10 @@
-import { getSearchBar } from "../repositories/searchBarRepository.js";
+import { getUsersToSearchBar } from "../repositories/searchBarRepository.js";
 
-export async function searchBarUsers(req, res) {
+export async function getSearchBar(req, res) {
     const { name } = req.params;
+    const { user } = res.locals;
     try{
-        const result = await getSearchBar(name);
+        const result = await getUsersToSearchBar(name, user.id);
         res.send(result.rows);
         return (result.rows)
     }catch (error) {
