@@ -132,7 +132,6 @@ export async function posts(req, res) {
           link,
           postText,
           userId,
-          
           metaId,
           postId,
           url,
@@ -142,8 +141,7 @@ export async function posts(req, res) {
           userName,
           userImage,
           isLike,
-          repostId,
-          respostUserId
+          numberReposts
         ] = row;
 
         return {
@@ -157,8 +155,7 @@ export async function posts(req, res) {
           userName,
           userImage,
           isLike: isLike,
-          repostId,
-          respostUserId,
+          numberReposts
         };
       })
     );

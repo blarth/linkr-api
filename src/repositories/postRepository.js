@@ -52,7 +52,7 @@ export async function getPosts(user, offset) {
   return connection.query(
     {
       text: `
-    SELECT posts.*,"metaData".*,users.name, users.image AS "userImage","likesPosts".like
+    SELECT posts.*,"metaData".*,users.name, users.image AS "userImage","likesPosts".like, (SELECT COUNT(*) FROM shares WHERE shares."postId"=posts.id) AS "numberReposts" 
     FROM posts
     JOIN "metaData" 
     ON posts.id="metaData"."postId"
@@ -62,7 +62,7 @@ export async function getPosts(user, offset) {
     ON posts.id="likesPosts"."postId" and "likesPosts"."userId"=$1
     JOIN followers
     ON followers."followedByUserId"=users.id
-    WHERE followers."userId"=$1
+    
     ORDER BY posts.id DESC 
     LIMIT 10
     ${offset}

@@ -12,6 +12,28 @@ export async function createRepost(postId, userId) {
     );
   }
 
+  export async function verifyRepost(postId, userId){
+    return connection.query(
+      ` 
+      SELECT *
+      FROM 
+      shares 
+      WHERE "postId"=$1 AND "userId"=$2
+      `,
+      [postId, userId]
+    );
+  }
+  export async function deleteRepost(postId, userId){
+    return connection.query(
+      ` 
+      DELETE  
+      FROM shares 
+      WHERE "postId"=$1 AND "userId"=$2
+      `,
+      [postId, userId]
+    );
+  }
+
   export async function getReposts(user, offset) {
     return connection.query(
       {
