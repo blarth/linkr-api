@@ -4,6 +4,6 @@ import { validateTokenMiddleware } from "../middlewares/validateTokenMiddleware.
 
 const commentRouter = Router();
 
-commentRouter.get("/comments/:id/:offset", validateTokenMiddleware, getComments);
+commentRouter.get("/comments/:id", validateTokenMiddleware, getComments);
 
 export default commentRouter;
