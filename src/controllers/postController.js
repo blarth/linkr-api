@@ -109,8 +109,6 @@ async function postHashtagsLinks(postId, hashtags, res) {
         str += `$${arr.length})`;
       }
     }
-    console.log(str);
-    console.log(arr);
     await insertHashtagsLinksMiddleTable(str, arr);
     res.sendStatus(201);
   } catch (error) {
@@ -121,8 +119,8 @@ async function postHashtagsLinks(postId, hashtags, res) {
 
 export async function posts(req, res) {
   const { user } = res.locals;
-  const {offset} = req.params;
-  const offsetString = `OFFSET ${offset}`
+  const { offset } = req.params;
+  const offsetString = `OFFSET ${offset}`;
   try {
     const result = await getPosts(user, offsetString);
 
@@ -134,6 +132,7 @@ export async function posts(req, res) {
           link,
           postText,
           userId,
+          numberOfComments,
           metaId,
           postId,
           url,
@@ -153,6 +152,7 @@ export async function posts(req, res) {
           postText,
           postId,
           userId,
+          numberOfComments,
           metadata: { url, title, description, image },
           userName,
           userImage,
