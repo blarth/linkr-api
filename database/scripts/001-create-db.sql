@@ -62,5 +62,6 @@ CREATE TABLE "comments"(
 CREATE TABLE "shares"(
 	"id" SERIAL PRIMARY KEY,
 	"postId" INTEGER NOT NULL REFERENCES "posts"("id"),
-	"userId" INTEGER NOT NULL REFERENCES "users"("id")
+	"userId" INTEGER NOT NULL REFERENCES "users"("id"),
+	"userName" TEXT NOT NULL 
 );
