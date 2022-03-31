@@ -43,3 +43,9 @@ export async function checkFollowing(id) {
     [id]
   );
 }
+export async function getUserById(id) {
+  return connection.query(
+    `SELECT id, name AS "userName", users.image AS "userImage" FROM users WHERE id=$1`,
+    [id]
+  );
+}
