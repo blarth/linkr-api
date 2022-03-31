@@ -23,7 +23,12 @@ import {
   getPreviousHashtags,
   deleteHashtagsFromMiddleTable,
 } from "../repositories/hashtagRepository.js";
-import { createRepost, getReposts, numberReposts } from "../repositories/repostRepository.js";
+import {
+  createRepost,
+  getReposts,
+  numberReposts,
+} from "../repositories/repostRepository.js";
+import { getUserById } from "../repositories/userRepository.js";
 
 export async function postLink(req, res) {
   const { link, postText } = req.body;
@@ -126,7 +131,6 @@ export async function posts(req, res) {
 
     res.send(
       result.rows.map((row) => {
-        
         const [
           id,
           link,
@@ -141,7 +145,7 @@ export async function posts(req, res) {
           userName,
           userImage,
           isLike,
-          numberReposts
+          numberReposts,
         ] = row;
 
         return {
@@ -150,12 +154,12 @@ export async function posts(req, res) {
           postText,
           postId,
           userId,
-          
+
           metadata: { url, title, description, image },
           userName,
           userImage,
           isLike: isLike,
-          numberReposts
+          numberReposts,
         };
       })
     );
@@ -191,38 +195,38 @@ export async function postsById(req, res) {
   const { user } = res.locals;
   try {
     const result = await getPostsById(user.id, id);
+    const { rows: data } = await getUserById(id);
+    const userData = data[0];
+    const answer = result.rows.map((row) => {
+      const [
+        id,
+        link,
+        postText,
+        userId,
+        metaId,
+        postId,
+        url,
+        title,
+        description,
+        image,
+        userName,
+        userImage,
+        isLike,
+      ] = row;
 
-    res.send(
-      result.rows.map((row) => {
-        const [
-          id,
-          link,
-          postText,
-          userId,
-          metaId,
-          postId,
-          url,
-          title,
-          description,
-          image,
-          userName,
-          userImage,
-          isLike,
-        ] = row;
-
-        return {
-          id,
-          link,
-          postText,
-          postId,
-          userId,
-          metadata: { url, title, description, image },
-          userName,
-          userImage,
-          isLike,
-        };
-      })
-    );
+      return {
+        id,
+        link,
+        postText,
+        postId,
+        userId,
+        metadata: { url, title, description, image },
+        userName,
+        userImage,
+        isLike,
+      };
+    });
+    res.send({ answer, userData });
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
@@ -411,9 +415,3 @@ export async function editPost(req, res) {
     res.sendStatus(500);
   }
 }
-
-
-
-
-
-
