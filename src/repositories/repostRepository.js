@@ -23,7 +23,7 @@ export async function createRepost(postId, userId) {
       ON posts."userId"=users.id
       LEFT JOIN "likesPosts" 
       ON posts.id="likesPosts"."postId" and "likesPosts"."userId"=$1
-      JOIN shares
+      LEFT JOIN shares
       ON shares."postId"=posts.id
       ORDER BY posts.id DESC
       LIMIT 10
@@ -36,14 +36,11 @@ export async function createRepost(postId, userId) {
   }
 
 
-export async function numberReposts(postId){
+export async function numberReposts([postId]){
     return connection.query(`
-    SELECT COUNT(id) AS "numberReposts", posts.id as "postID"
+    SELECT COUNT(*) AS "numberReposts",
     FROM shares
-    JOIN posts
-    ON posts.postID=shares."postId"
-    WHERE shares."postId"=$1 AND posts.postID=$1
-    GROUP BY "numberReposts", posts.postID
-    ORDER BY COUNT(id) DESC;
+    WHERE shares."postId"=$1
+    GROUP BY "numberReposts"
     `,[postId])
 }

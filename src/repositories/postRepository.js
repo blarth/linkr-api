@@ -51,17 +51,18 @@ export async function getLastPost(id) {
 export async function getPosts(user, offset) {
   return connection.query(
     {
-      text: `SELECT posts.*,"metaData".*,users.name, users.image AS "userImage","likesPosts".like
+      text: `
+    SELECT posts.*,"metaData".*,users.name, users.image AS "userImage","likesPosts".like
     FROM posts
     JOIN "metaData" 
     ON posts.id="metaData"."postId"
     JOIN users
-    ON posts."userId"=users.id
+    ON posts."userId"=users.id 
     LEFT JOIN "likesPosts" 
     ON posts.id="likesPosts"."postId" and "likesPosts"."userId"=$1
     JOIN followers 
-    ON followers."followedByUserId"=$1
-    ORDER BY posts.id DESC
+ ON followers."followedByUserId"=$1
+    ORDER BY posts.id DESC 
     LIMIT 10
     ${offset}
      `,
