@@ -47,35 +47,56 @@ export async function getLastPost(id) {
     [id]
   );
 }
+//LEFT JOIN shares ON shares."postId"=posts.id
 
 export async function getPosts(user, offset) {
   return connection.query(
     {
       text: `
-    SELECT posts.*,
-          "metaData".*,
-          users.name,
-          users.image AS "userImage",
-          "likesPosts".like,
-          (SELECT Count(*)
-            FROM   shares
-            WHERE  shares."postId" = posts.id) AS "numberReposts",
-            (SELECT users.name FROM shares JOIN users ON users.id=shares."userId" WHERE shares."postId"=posts.id) AS "reposterName"
-    FROM   posts
-          JOIN "metaData"
-            ON posts.id = "metaData"."postId"
-          JOIN users
-            ON posts."userId" = users.id
-          LEFT JOIN "likesPosts"
-                  ON posts.id = "likesPosts"."postId"
-                    AND "likesPosts"."userId"=$1
-          LEFT JOIN followers
-                  ON followers."userId" = posts."userId"
-    WHERE  followers."followedByUserId"=$1
-    
+      SELECT
+      posts.*,
+      "metaData".*,
+      users.name,
+      users.image AS "userImage",
+      "likesPosts".like,
+      (SELECT Count(*) FROM shares WHERE shares."postId" = posts.id) AS "numberReposts",
+      "sharerName", "sharerId"
+      
 
-    
-    ORDER  BY posts.id DESC
+    FROM
+      posts
+      JOIN "metaData" ON posts.id = "metaData"."postId"
+      JOIN users ON posts."userId" = users.id
+      LEFT JOIN "likesPosts" ON posts.id = "likesPosts"."postId" AND "likesPosts"."userId"=$1
+      LEFT JOIN followers ON followers."userId" = posts."userId"
+      JOIN shares ON shares."postId"=posts.id
+      JOIN(
+        SELECT users.name AS "sharerName", users.id AS "sharerId", shares.id
+        FROM shares
+        JOIN users ON users.id = shares."userId"
+    ) AS "repostsUser" ON "repostsUser".id = shares.id
+    WHERE
+      followers."followedByUserId"=$1
+    UNION ALL
+    SELECT
+      posts.*,
+      "metaData".*,
+      users.name,
+      users.image AS "userImage",
+      "likesPosts".like,
+      (SELECT Count(*) FROM shares WHERE shares."postId" = posts.id) AS "numberReposts",
+      shares."userName" AS "sharerName", shares."userId" AS "sharerId"
+      
+    FROM shares
+      JOIN posts ON posts.id = shares."postId"
+      JOIN "metaData" ON posts.id = "metaData"."postId"
+      JOIN users ON posts."userId" = users.id
+      LEFT JOIN "likesPosts" ON posts.id = "likesPosts"."postId" AND "likesPosts"."userId"=$1
+      JOIN(
+        SELECT users.name AS "sharerName", users.id AS "sharerId", shares.id
+        FROM shares
+        JOIN users ON users.id = shares."userId"
+    ) AS "repostsUser" ON "repostsUser".id = shares.id
     LIMIT 10
     ${offset}
      `,
@@ -150,12 +171,7 @@ export async function getPostsById(userId, id) {
     [userId, id]
   );
 }
-export async function getUserById(id) {
-  return connection.query(
-    `SELECT name AS "userName", users.image AS "userImage" FROM users WHERE id=$1`,
-    [id]
-  );
-}
+
 export async function getPostsByHashtag(hashtag, user) {
   return connection.query(
     {
