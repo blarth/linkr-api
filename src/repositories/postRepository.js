@@ -80,7 +80,7 @@ export async function getPosts(user, offset) {
                     where
                         f."followedByUserId" = $1
                 )
-        UNION 
+        UNION ALL
         SELECT
           pt.*,
           mt."postId", mt.url, mt.title, mt.description, mt.image,
@@ -277,40 +277,3 @@ export async function deletePost(id) {
     [id]
   );
 }
-
-// export async function deletePost(id) {
-//   const deleteMetaDataById = connection.query(
-//     `
-//     DELETE FROM "metaData" WHERE "postId" = $1
-//   `,
-//     [id]
-//   );
-
-//   const deleteLikesPostsById = connection.query(
-//     `
-//     DELETE FROM "likesPosts" WHERE "postId" = $1
-//   `,
-//     [id]
-//   );
-
-//   const deleteHashtagsPostsById = connection.query(
-//     `
-//     DELETE FROM "hashtagsPosts" WHERE "postId" = $1
-//   `,
-//     [id]
-//   );
-
-//   const deletePostById = connection.query(
-//     `
-//     DELETE FROM posts WHERE id = $1
-//   `,
-//     [id]
-//   );
-
-//   return {
-//     deleteMetaDataById,
-//     deleteLikesPostsById,
-//     deleteHashtagsPostsById,
-//     deletePostById,
-//   };
-// }
