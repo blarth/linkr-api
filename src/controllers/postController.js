@@ -125,10 +125,9 @@ export async function posts(req, res) {
   const offsetString = `OFFSET ${offset}`;
   try {
     const result = await getPosts(user, offsetString);
-    
+
     res.send(
       result.rows.map((row) => {
-        
         const [
           id,
           link,
@@ -147,13 +146,14 @@ export async function posts(req, res) {
           isLike,
           numberReposts,
         ] = row;
-        
+
         return {
           id,
           link,
           postText,
           userId,
           reposterName,
+          reposterId,
           metadata: { url, title, description, image },
           userName,
           userImage,
@@ -202,29 +202,32 @@ export async function postsById(req, res) {
         link,
         postText,
         userId,
-        metaId,
-        postId,
+        mtPostId,
         url,
         title,
         description,
         image,
+        reposterName,
+        reposterId,
         userName,
+        userOwnerId,
         userImage,
         isLike,
-        numberReposts
+        numberReposts,
       ] = row;
 
       return {
         id,
         link,
         postText,
-        postId,
         userId,
+        reposterName,
+        reposterId,
         metadata: { url, title, description, image },
         userName,
         userImage,
-        isLike,
-        numberReposts
+        isLike: isLike,
+        numberReposts,
       };
     });
     res.send({ answer, userData });
@@ -272,7 +275,7 @@ export async function postsByHashtag(req, res) {
           userName,
           userImage,
           isLike,
-          numberReposts
+          numberReposts,
         };
       })
     );
@@ -294,7 +297,7 @@ export async function deletePosts(req, res) {
     await deleteMetaData(id);
     await deleteHashtagsPost(id);
     await deleteLikesPost(id);
-    await deleteShare(id)
+    await deleteShare(id);
     await deletePost(id);
     res.sendStatus(200);
   } catch (error) {

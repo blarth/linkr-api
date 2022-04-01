@@ -174,17 +174,53 @@ export async function updateLikeStatus(id, user, status) {
 export async function getPostsById(userId, id) {
   return connection.query(
     {
-      text: `SELECT posts.*, "metaData".*, users.name, users.image AS "userImage","likesPosts".like,  (SELECT Count(*) FROM shares WHERE shares."postId" = posts.id) AS "numberReposts"
-      FROM posts
-      JOIN "metaData" 
-      ON posts.id="metaData"."postId"
-      JOIN users
-      ON posts."userId"=users.id
-      LEFT JOIN "likesPosts" 
-      ON posts.id="likesPosts"."postId" and "likesPosts"."userId"=$1
-      WHERE users.id=$2
-      ORDER BY posts.id DESC
-      LIMIT 20 `,
+      text: ` SELECT * FROM (
+        SELECT
+          pt.*,
+          mt."postId", mt.url, mt.title, mt.description, mt.image,
+          null as userNameRepost,
+          null as userIdRepost,
+          upost.name as userNamePost,
+          upost.id as userNamePostId,
+          upost.image as "userImage",
+          "likesPosts".like,
+          ( select Count(*) from shares where    shares."postId" = pt.id) as "numberReposts"
+        from
+        posts pt
+            join "metaData" mt on
+                    pt.id = mt."postId"
+            join users upost on
+                    upost.id = pt."userId"
+            LEFT JOIN "likesPosts" ON pt.id = "likesPosts"."postId" AND "likesPosts"."userId"= $1
+                WHERE upost.id=$2
+        UNION ALL
+        SELECT
+          pt.*,
+          mt."postId", mt.url, mt.title, mt.description, mt.image,
+          uRepost.name as userNameRepost,
+          uRepost.id as userIdRepost,
+          upost.name as userNamePost,
+          upost.id as userNamePostId,
+          upost.image as "userImage",
+          "likesPosts".like,
+          ( select Count(*) from shares where    shares."postId" = s."postId") as "numberReposts"
+      from
+          shares s
+      join posts pt on
+          pt.id = s."postId"
+      join users uRepost
+          on
+          uRepost.id = s."userId"
+      join users upost
+          on
+          upost.id = pt."userId"
+      join "metaData" mt on
+          s."postId" = mt."postId"
+      LEFT JOIN "likesPosts" ON s."postId" = "likesPosts"."postId" AND "likesPosts"."userId"= $1
+      WHERE uRepost.id=$2
+      ) "mainTable"
+      ORDER BY "mainTable"."id" DESC
+     `,
       rowMode: "array",
     },
     [userId, id]

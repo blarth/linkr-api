@@ -88,11 +88,15 @@ The server will respond with a token, to be used on every other route where auth
 
 To signout, simply send the request with a header containing the Authorization key above.
 
-#### ```GET /timeline, /hashtags, POST /timeline```
+#### ```GET /users```
 
-Routes without params.
+Send the request with auth header to get info about you, like profile picture and name.
 
-With the auth header, send the request to timeline to get all posts from all users, most recent first, and hashtags, to get the trending hashtags, ten most used first. To post a link, send request to timeline, as a logged user, with the following:
+#### ```GET /timeline:offset?, /hashtags, POST /timeline```
+
+Get timeline route with optional offset parameter, other routes without params.
+
+With the auth header, send the request to timeline to get the ten last posts from users you follow, including their reposts, most recent first, and hashtags, to get the trending hashtags, ten most used first. The optional parameter lets you offset messages to get starting from the n-th last message. To post a link, send request to timeline, as a logged user, with the following:
 
 {
 
@@ -101,7 +105,26 @@ With the auth header, send the request to timeline to get all posts from all use
 
 }
 
+#### ```POST /users/follow```
+
+To follow a user, send the request with the auth and a body with:
+
+{
+
+	followedUserId: id of user you want to follow
+
+}
+
+#### ```GET /users/following```
+
+With the auth header, get all users you're following.
+
 Resquests with params:
+
+#### ```GET /users/follow/:id```
+
+The request is used to check if user with id <:ID> is your follower.
+
 #### ```PUT /posts/:id/:status```
 
 Send a request with the post id and the current status it has, liked or not. The server will like the post or remove it, adding or removing your user from the list of people who liked it.
@@ -125,6 +148,31 @@ As a logged user and publisher of the post, you can edit it by sending a request
 #### ```GET /likes/:id```
 
 Get all likes from post with id <:ID>
+
+#### ```GET /users/:id```
+
+Get all posts from user's id <:ID>
+
+#### ```GET and POST /comments/:id```
+
+As a logged user, with the auth header setting, get the comments from post with <:ID>, info about commentator, such as if it's the original post's author or if it's followed by the logged user is also present. To post, send a request with the auth header shown above and a body with:
+
+{
+
+	comment: your comment
+
+}
+
+#### ```GET and POST /repost/:id```
+
+Send the post request with the auth header and the post's id to mark the post as reposted by you. You follower's will be able to see it if they don't follow the original poster and all comments of the original post are loaded. You'll also increase the repost count of that post.
+
+To check whether it has been reposted or not, send the get request.
+
+#### ```GET searchbar/:name```
+
+Get all users with names starting with <:NAME>, as a logged user, the people you follow being shown up first. 
+
 ### :man_technologist: Authors
 <p>Made with care by</p>
 <a href="https://github.com/blarth"><img  style="border-radius: 50%;"  src="https://avatars.githubusercontent.com/u/79117658?v=4"  width="100px;"  alt="João Marcos Inocente"/></a>
