@@ -133,35 +133,31 @@ export async function posts(req, res) {
           link,
           postText,
           userId,
-          metaId,
-          postId,
+          mtPostId,
           url,
           title,
           description,
           image,
+          reposterName,
+          reposterId,
           userName,
+          userOwnerId,
           userImage,
           isLike,
           numberReposts,
-          sharerName,
-          sharerId
-
         ] = row;
         
         return {
           id,
           link,
           postText,
-          postId,
           userId,
+          reposterName,
           metadata: { url, title, description, image },
           userName,
           userImage,
           isLike: isLike,
           numberReposts,
-          
-          sharerName,
-          sharerId
         };
       })
     );
@@ -214,6 +210,7 @@ export async function postsById(req, res) {
         userName,
         userImage,
         isLike,
+        numberReposts
       ] = row;
 
       return {
@@ -226,6 +223,7 @@ export async function postsById(req, res) {
         userName,
         userImage,
         isLike,
+        numberReposts
       };
     });
     res.send({ answer, userData });
@@ -259,6 +257,7 @@ export async function postsByHashtag(req, res) {
           userName,
           userImage,
           isLike,
+          numberReposts
         ] = row;
 
         return {
@@ -271,6 +270,7 @@ export async function postsByHashtag(req, res) {
           userName,
           userImage,
           isLike,
+          numberReposts
         };
       })
     );
