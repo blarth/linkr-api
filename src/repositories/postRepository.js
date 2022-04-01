@@ -260,6 +260,14 @@ export async function deleteLikesPost(id) {
     [id]
   );
 }
+export async function deleteShare(id) {
+  return connection.query(
+    `
+    DELETE FROM shares WHERE "postId" = $1
+  `,
+    [id]
+  );
+}
 
 export async function deletePost(id) {
   return connection.query(

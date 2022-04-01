@@ -15,6 +15,7 @@ import {
   deleteHashtagsPost,
   deleteLikesPost,
   deletePost,
+  deleteShare,
 } from "../repositories/postRepository.js";
 import {
   getExistingHashtags,
@@ -292,6 +293,7 @@ export async function deletePosts(req, res) {
     await deleteMetaData(id);
     await deleteHashtagsPost(id);
     await deleteLikesPost(id);
+    await deleteShare(id)
     await deletePost(id);
     res.sendStatus(200);
   } catch (error) {
