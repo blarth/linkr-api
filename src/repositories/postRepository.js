@@ -53,52 +53,71 @@ export async function getPosts(user, offset) {
   return connection.query(
     {
       text: `
-      SELECT
-      posts.*,
-      "metaData".*,
-      users.name,
-      users.image AS "userImage",
-      "likesPosts".like,
-      (SELECT Count(*) FROM shares WHERE shares."postId" = posts.id) AS "numberReposts",
-      "sharerName", "sharerId"
-      
-
-    FROM
-      posts
-      JOIN "metaData" ON posts.id = "metaData"."postId"
-      JOIN users ON posts."userId" = users.id
-      LEFT JOIN "likesPosts" ON posts.id = "likesPosts"."postId" AND "likesPosts"."userId"=$1
-      LEFT JOIN followers ON followers."userId" = posts."userId"
-      JOIN shares ON shares."postId"=posts.id
-      JOIN(
-        SELECT users.name AS "sharerName", users.id AS "sharerId", shares.id
-        FROM shares
-        JOIN users ON users.id = shares."userId"
-    ) AS "repostsUser" ON "repostsUser".id = shares.id
-    WHERE
-      followers."followedByUserId"=$1
-    UNION ALL
-    SELECT
-      posts.*,
-      "metaData".*,
-      users.name,
-      users.image AS "userImage",
-      "likesPosts".like,
-      (SELECT Count(*) FROM shares WHERE shares."postId" = posts.id) AS "numberReposts",
-      shares."userName" AS "sharerName", shares."userId" AS "sharerId"
-      
-    FROM shares
-      JOIN posts ON posts.id = shares."postId"
-      JOIN "metaData" ON posts.id = "metaData"."postId"
-      JOIN users ON posts."userId" = users.id
-      LEFT JOIN "likesPosts" ON posts.id = "likesPosts"."postId" AND "likesPosts"."userId"=$1
-      JOIN(
-        SELECT users.name AS "sharerName", users.id AS "sharerId", shares.id
-        FROM shares
-        JOIN users ON users.id = shares."userId"
-    ) AS "repostsUser" ON "repostsUser".id = shares.id
-    LIMIT 10
-    ${offset}
+      SELECT * FROM (
+        SELECT
+          pt.*,
+          mt."postId", mt.url, mt.title, mt.description, mt.image,
+          null as userNameRepost,
+          null as userIdRepost,
+          upost.name as userNamePost,
+          upost.id as userNamePostId,
+          upost.image as "userImage",
+          "likesPosts".like,
+          ( select Count(*) from shares where    shares."postId" = pt.id) as "numberReposts"
+        from
+        posts pt
+            join "metaData" mt on
+                    pt.id = mt."postId"
+            join users upost on
+                    upost.id = pt."userId"
+            LEFT JOIN "likesPosts" ON pt.id = "likesPosts"."postId" AND "likesPosts"."userId"= $1
+                where
+                    pt."userId" in (
+                    select
+                        "userId"
+                    from
+                        followers f
+                    where
+                        f."followedByUserId" = $1
+                )
+        UNION 
+        SELECT
+          pt.*,
+          mt."postId", mt.url, mt.title, mt.description, mt.image,
+          uRepost.name as userNameRepost,
+          uRepost.id as userIdRepost,
+          upost.name as userNamePost,
+          upost.id as userNamePostId,
+          upost.image as "userImage",
+          "likesPosts".like,
+          ( select Count(*) from shares where    shares."postId" = s."postId") as "numberReposts"
+      from
+          shares s
+      join posts pt on
+          pt.id = s."postId"
+      join users uRepost
+          on
+          uRepost.id = s."userId"
+      join users upost
+          on
+          upost.id = pt."userId"
+      join "metaData" mt on
+          s."postId" = mt."postId"
+      LEFT JOIN "likesPosts" ON s."postId" = "likesPosts"."postId" AND "likesPosts"."userId"= $1
+      where
+          s."userId" in (
+          select
+              "userId"
+          from
+              followers f
+          where
+              f."followedByUserId" = $1
+      )
+      ) "mainTable"
+      ORDER BY "mainTable"."id" DESC
+      LIMIT 10
+      ${offset}  
+    
      `,
       rowMode: "array",
     },
@@ -155,7 +174,7 @@ export async function updateLikeStatus(id, user, status) {
 export async function getPostsById(userId, id) {
   return connection.query(
     {
-      text: `SELECT posts.*, "metaData".*, users.name, users.image AS "userImage","likesPosts".like
+      text: `SELECT posts.*, "metaData".*, users.name, users.image AS "userImage","likesPosts".like,  (SELECT Count(*) FROM shares WHERE shares."postId" = posts.id) AS "numberReposts"
       FROM posts
       JOIN "metaData" 
       ON posts.id="metaData"."postId"
@@ -175,7 +194,7 @@ export async function getPostsById(userId, id) {
 export async function getPostsByHashtag(hashtag, user) {
   return connection.query(
     {
-      text: `SELECT posts.*, "metaData".*, users.name, users.image AS "userImage","likesPosts".like,hashtags.id,"hashtagsPosts".id
+      text: `SELECT posts.*, "metaData".*, users.name, users.image AS "userImage","likesPosts".like,hashtags.id,"hashtagsPosts".id, (SELECT Count(*) FROM shares WHERE shares."postId" = posts.id) AS "numberReposts"
       FROM posts
       JOIN "metaData" 
       ON posts.id="metaData"."postId"
