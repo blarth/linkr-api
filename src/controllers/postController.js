@@ -244,7 +244,7 @@ export async function postsByHashtag(req, res) {
   hashtag = `#${hashtag}`;
   try {
     const result = await getPostsByHashtag(hashtag, user);
-
+    
     res.send(
       result.rows.map((row) => {
         const [
@@ -252,7 +252,7 @@ export async function postsByHashtag(req, res) {
           link,
           postText,
           userId,
-          metaId,
+          mtPostId,
           postId,
           url,
           title,
@@ -261,6 +261,8 @@ export async function postsByHashtag(req, res) {
           userName,
           userImage,
           isLike,
+          hashtagId,
+          ,
           numberReposts,
         ] = row;
 
@@ -268,7 +270,6 @@ export async function postsByHashtag(req, res) {
           id,
           link,
           postText,
-          postId,
           userId,
           metadata: { url, title, description, image },
           userName,
