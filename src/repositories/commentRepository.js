@@ -11,11 +11,19 @@ export async function fetchComments(postId, userId){
 	`, [postId, userId])
 }
 
-export async function  getNotFollowers(name, user){
+// export async function  getNotFollowers(name, user){
+//     return connection.query(`
+//     SELECT u.id, u.name, u.image FROM users u 
+//     LEFT JOIN "followers" f ON f."userId" =  u.id
+//     WHERE name like $1
+//     GROUP BY f."followedByUserId" = $2, u.id
+// `,[name, user]);
+// }
+
+export async function postComment(postId, comment, user){
     return connection.query(`
-    SELECT u.id, u.name, u.image FROM users u 
-    LEFT JOIN "followers" f ON f."userId" =  u.id
-    WHERE name like $1
-    GROUP BY f."followedByUserId" = $2, u.id
-`,[name, user]);
+	INSERT INTO 
+    "comments" ("postId", comment, "userId")
+    VALUES ($1, $2, $3)
+`,[postId, comment, user]);
 }
