@@ -1,14 +1,14 @@
 import connection from "../../db.js";
 
-export async function fetchComments(postId){
+export async function fetchComments(postId, userId){
 	return connection.query(`
-		SELECT comments.*, users.name, users.image, followers."followedByUserId" as following FROM comments
-		LEFT JOIN followers ON followers."userId"=comments."userId"
+		SELECT comments.*, users.name, users.image, followers."userId" as following
+		FROM comments
 		JOIN users ON comments."userId"=users.id
+		LEFT JOIN followers ON followers."followedByUserId"=$2 AND followers."userId"=comments."userId"
 		WHERE comments."postId"=$1
 		ORDER BY comments.id DESC
-		LIMIT 10
-	`, [postId])
+	`, [postId, userId])
 }
 
 export async function  getNotFollowers(name, user){
