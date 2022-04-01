@@ -39,14 +39,3 @@ import { createRepost, deleteRepost, verifyRepost } from "../repositories/repost
     }
   }
   
-  /* export async function getNumberReposts(req, res){
-    const {id} = req.params
-    try {
-      const {rows : numberReposts} = await numberReposts(id)
-      console.log(numberReposts)
-      res.sendStatus(200)
-    } catch (error) {
-      console.log(error);
-      res.sendStatus(500);
-    }
-  } */
